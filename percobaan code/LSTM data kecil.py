@@ -24,7 +24,7 @@ class LSTMCell:
                 ,[0.842874383	,-0.324206065	,0.907722829	,-0.593738792]]
 
         w = pd.DataFrame(self.W)
-        w.to_csv("P_W.csv")           
+        w.to_csv("P_W_datakecil.csv")           
         self.h = []
         self.C = []
         self.C_bar = []

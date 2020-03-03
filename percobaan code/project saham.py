@@ -73,7 +73,6 @@ x,y=intersection(x1,y1,x2,y2)
         except:
             T[:,i]=np.NaN
 
-
     in_range= (T[0,:] >=0) & (T[1,:] >=0) & (T[0,:] <=1) & (T[1,:] <=1)
 
     xy0=T[2:,in_range]
@@ -84,6 +83,16 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 def optionBobot():
     print ("bobotnya adalah ")
+
+# print input squence
+def print_sequence(sequence,max_ex,min_ex):
+    data_sequence_close_NT = sequence[:,2:]
+    sequenceLength = len(sequence)
+    sequenceNT = denormal(sequenceLength,sequence,max_ex,min_ex)
+    print ("urutan yang sudah normalisasi ",sequenceNT)
+    print ("urutan yang belum normalisasi ",data_sequence_close_NT[:,-1])
+    return (sequenceNT)
+
 
 class LSTMCell: 
     # numCells = ukuran penampungan I,o,z,dll
@@ -103,23 +112,7 @@ class LSTMCell:
         # weight = weight.values.tolist()
         # weighting = np.array(weight)
         # self.W = weighting
-        # self.W = [[ 0.09207027,-0.18060661,0.98946575,-0.48309076,0.94051534,0.64351658,-0.48806959,-0.72559264,-0.60016537,-0.08540686,],
-        #                 [ 0.46416453,-0.72592599,0.97322608,-0.13671361,0.78195894,0.75862402,-0.09931338,-0.08540686,0.79411674,-0.30359579],
-        #                 [-0.36402844,0.10979515,0.9923294,0.98477933,-0.24125407,-0.91229966,0.69716758,-0.91751814,-0.30359579,0.87780007],
-        #                 [ 0.32902436,-0.31113299,0.76189837,-0.24283255,-0.2798801,0.28109383,0.87780007,-0.30435861,0.22550631,-0.53030671],
-        #                 [-0.70578599,0.13712289,-0.96032757,-0.06028764,0.51723035,-0.20469428,-0.15315317,0.5877274,0.51960252,-0.81812601],
-        #                 [-0.37942954,-0.03646242,-0.82212568,-0.01578725,-0.12805424,0.19358212,-0.53030671,0.92523288,-0.81812601,-0.05027461],
-        #                 [ 0.85010693,0.57612326,-0.19705865,-0.14078874,-0.71352918,0.01675918,0.18472475,-0.87480991,0.56895533,-0.17905732],
-        #                 [-0.39285851,0.44274957,-0.09718712,0.30892256,-0.15118586,0.19277667,-0.44200491,0.21791457,-0.57602992,0.53684159],
-        #                 [-0.82451773,0.56976586,0.51111095,0.46611579,-0.05923572,-0.05027461,-0.09292947,0.96217926,-0.97011538,0.49328673],
-        #                 [-0.2983563,0.62251088,-0.47986506,-0.58596497,-0.08054299,-0.76385081,-0.32009015,-0.17905732,0.77038984,-0.12406856],
-        #                 [-0.66281317,0.91078821,0.13788891,-0.75973639,-0.24872589,0.13412562,0.12609304,0.53684159,0.49328673,0.13412562],
-        #                 [-0.76069926,-0.36605156,0.85875715,0.14243079,-0.55055899,-0.80545663,0.67942735,-0.12406856,-0.49728498,-0.24872589],
-        #                 [ 0.09207027,-0.18060661,0.98946575,-0.48309076,0.94051534,0.64351658,-0.48806959,-0.72559264,-0.60016537,-0.08540686,],
-        #                 [ 0.46416453,-0.72592599,0.97322608,-0.13671361,0.78195894,0.75862402,-0.09931338,-0.08540686,0.79411674,-0.30359579],
-        #                 [-0.36402844,0.10979515,0.9923294,0.98477933,-0.24125407,-0.91229966,0.69716758,-0.91751814,-0.30359579,0.87780007],
-        #                 [ 0.32902436,-0.31113299,0.76189837,-0.24283255,-0.2798801,0.28109383,0.87780007,-0.30435861,0.22550631,-0.53030671]]
-                        
+                    
         self.h = []
         self.C = []
         self.C_bar = []
@@ -167,7 +160,7 @@ class LSTMCell:
         # #print("tanh ",np.tanh(C))
         # #print("h---", self.h)
         #print("----------------------------------------------------------------------")
-        return h
+        return (h,C,o,f,i,C_bar,z,I)
     # x = trainingSequences (data training)
     def forwardPass(self, x):
         self.h = []
@@ -196,10 +189,31 @@ class LSTMCell:
         self.I.append(np.zeros(numCells)) 
         self.z.append(np.zeros(numCells)) 
 
+        O_I= [self.forwardStep(x_t)[7] for x_t in x]
+    
+        P_I = pd.DataFrame(self.I)
+        # P_I.to_csv("P_I.csv")
+            
+        O_z= [self.forwardStep(x_t)[6] for x_t in x]
         
-        outputs = [self.forwardStep(x_t) for x_t in x]
+        # output_z = pd.DataFrame(O_z)
+        # output_z.to_csv("outputs(z).csv")
         
-        return outputs
+        O_c= [self.forwardStep(x_t)[1] for x_t in x]
+        # output_C = pd.DataFrame(O_C)
+        # output_C.to_csv("outputs(C).csv")
+        
+        O_o= [self.forwardStep(x_t)[2] for x_t in x]
+        
+        O_f= [self.forwardStep(x_t)[3] for x_t in x]
+        
+        O_in= [self.forwardStep(x_t)[4] for x_t in x]
+        
+        O_c_bar= [self.forwardStep(x_t)[5] for x_t in x]
+
+        O_h = [self.forwardStep(x_t)[0] for x_t in x]
+        
+        return (O_I,O_z,O_c,O_o,O_f,O_in,O_c_bar,O_h)
 
     def backwardStep(self, t, dE_dh_t, dE_dc_tplus1):
         
@@ -321,15 +335,11 @@ class LSTMCell:
 
         return (E / (numTimePeriods), dE_dW)
 
-
     # should the actul data be used as the next input, or should its own input
     # be used as the next input?
-    def train(self, trainingData, numEpochs, learningRate, sequenceLength):
+    def train(self, trainingData, numEpochs, learningRate, sequenceLength,max_ex,min_ex):
         
         adaptiveLearningRate = learningRate 
-        # trainingSequences = sequenceProducer(trainingData, sequenceLength)
-        # for i in trainingSequences:
-        #     #print("trainingSequences epoch ",i)
         for epoch in range(numEpochs): #banyak epoch yang ditraining
             trainingSequences = sequenceProducer(trainingData, sequenceLength) #data training 
             epochError = 0.0
@@ -340,7 +350,7 @@ class LSTMCell:
                 #print("counter", counter)
                 #print("===================================================================")
                 # #print("Hasil self.forwardPass ",self.forwardPass(sequence[:-1]))
-                self.forwardPass(sequence[:])
+                self.forwardPass(sequence[:-1])
                 #print("banyak ",len(sequence[:]))
                 #print("forwardPass ",self.forwardPass(sequence[:]))
                 s = pd.DataFrame(self.I)
@@ -372,19 +382,31 @@ class LSTMCell:
 
                 epochError += E
                 # #print(epochError)
+
+                # print_sequence(sequence,max_ex,min_ex)
+
             # t = pd.DataFrame(self.W)
             # t.to_csv("W_final.csv")
             
             print('Epoch ' + str(epoch) + ' error: ' + str(epochError / counter))
 
-
     # needs a parameter about how far to forecast, and needs to use its own
     # results as inputs to the next thing, to keep forecasting
     def forecast(self, forecastingData):
-        self.forwardPass(forecastingData)
+        forward = self.forwardPass(forecastingData)
+        f_I = np.transpose(np.transpose(forward[0]))
+        f_z = np.transpose(np.transpose(forward[1]))
+        f_c = np.transpose(np.transpose(forward[2]))
+        f_o = np.transpose(np.transpose(forward[3]))
+        f_f = np.transpose(np.transpose(forward[4]))
+        f_i = np.transpose(np.transpose(forward[5]))
+        f_c_bar = np.transpose(np.transpose(forward[6]))
+        f_h = np.transpose(np.transpose(forward[7]))
+
         #print("proses forwaerd all",self.forwardPass(forecastingData))
         #print("proses forwaerd end ",np.transpose(np.transpose(self.h[-1])))
-        return np.transpose(np.transpose(self.h[-1]))
+        # np.transpose(np.transpose(self.h[-1]))
+        return (f_h[-1],f_I,f_z,f_c,f_o,f_f,f_i,f_c_bar,f_h)
 
     def forecastKSteps(self, forecastingData, timeData, k):
         self.forwardPass(forecastingData)
@@ -396,24 +418,24 @@ class LSTMCell:
 
         return np.transpose(np.transpose(self.h[-k:]))
 
-    # needs fixing
-    def test(self, testingData, sequenceLength):
-        avgError = 0.0
-        testingSequences = sequenceProducer(testingData, sequenceLength)
-        counter = 0
-        for sequence in testingSequences:
-            counter += 1
-            self.forwardPass(sequence[:])
-            E = 0.0
-            for j in range(sequenceLength - 1):
-                index = sequenceLength - j - 1
-                E = E + 0.5 * np.sum(np.square(self.h[index] - sequence[index, 2:])) # This is the error vector for this sequence
-            E = E / sequenceLength
-            avgError = avgError + E
-            print('Sequence ' + str(sequence) + ' error: ' + str(avgError / counter))
-        avgError = avgError / counter
+    # # needs fixing
+    # def test(self, testingData, sequenceLength):
+    #     avgError = 0.0
+    #     testingSequences = sequenceProducer(testingData, sequenceLength)
+    #     counter = 0
+    #     for sequence in testingSequences:
+    #         counter += 1
+    #         self.forwardPass(sequence[:])
+    #         E = 0.0
+    #         for j in range(sequenceLength - 1):
+    #             index = sequenceLength - j - 1
+    #             E = E + 0.5 * np.sum(np.square(self.h[index] - sequence[index, 2:])) # This is the error vector for this sequence
+    #         E = E / sequenceLength
+    #         avgError = avgError + E
+    #         print('Sequence ' + str(sequence) + ' error: ' + str(avgError / counter))
+    #     avgError = avgError / counter
         
-        return avgError
+    #     return avgError
 
 import datetime as dt
 
@@ -422,17 +444,10 @@ def readData(filename):
 
     data = data[['Date','Close']]
     data['Date'] = pd.to_datetime(data['Date'])
-    print (data['Date'][0])
+
     data['Date'] = data['Date'].dt.strftime("%Y%m%d").astype(int)
-    print (data['Date'][0])
     s = data.values.tolist()
     training_data  = np.array(s)
-
-    print (data['Date'][0])
-    # data['date'] = data['date'].dt.strftime("%Y%m%d").astype(int)
-    # data['date'] = pd.to_datetime(data['date'], errors='coerce')
-    # data['date'] = data['date'].dt.strftime("%Y%m%d").astype(int)
-    print (data['Date'][0])
 
     s = data.values.tolist()
     training_data  = np.array(s)
@@ -461,8 +476,9 @@ class LSTMNetwork:
 def sequenceProducer(trainingData, sequenceLength):
     indices = [i for i in range(0, trainingData.shape[0] - sequenceLength + 1, sequenceLength)] #inisial untuk training
     random.shuffle(indices)
+    sequenceLength_Tre = 0
     for index in indices:
-        # #print("trainingData : ",trainingData[index:index + sequenceLength+2])
+        sequenceLength_Tre += 1
         yield trainingData[index:index + sequenceLength+2]
 
 def forecastSequenceProducer(trainingData, sequenceLength):
@@ -479,24 +495,18 @@ def sk(skenario,data_sa):
     elif (skenario == 3):
         trainingData = data_sa[:-25]
         forecastData = data_sa[25:50]
+    elif (skenario == 4):
+        trainingData = data_sa[:-10]
+        forecastData = data_sa[10:20]
     else :
         trainingData = data_sa[:-1000]
         forecastData = data_sa[500:-500]
     return (trainingData, forecastData)
 
-def mean_absolute_percentage_error(y_true, y_pred): 
-    y_true, y_pred = np.array(y_true), np.array(y_pred)
-    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+# def mean_absolute_percentage_error(y_true, y_pred): 
+#     y_true, y_pred = np.array(y_true), np.array(y_pred)
+#     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
-def mean_squered_error (actual, predicted):
-    summation = 0  #variable to store the summation of differences
-    n = len(actual) #finding total number of items in list
-    for i in range (0,n):  #looping through each element of the list
-        difference = actual[i] - predicted[i]  #finding the difference between observed and predicted value
-        squared_difference = difference**2  #taking square of the differene 
-        summation +=  squared_difference  #taking a sum of all the differences
-    return (summation/n)  #dividing summation by total values to obtain average
-     
 def denormal (sequenceLength,sequence,max_ex,min_ex):
     sequenceN = []
     for i in range(sequenceLength):
@@ -504,6 +514,29 @@ def denormal (sequenceLength,sequence,max_ex,min_ex):
         data_sequence_close_DN += min_ex[1:]
         sequenceN.append(data_sequence_close_DN[0])
     return (np.array(sequenceN))
+
+# print in hidden layer (I,z,f,i,o,h)
+def ex_excel(list_table_hitung,list_table_hitung_str):
+    data_full = {}
+    data_perhitungan = pd.DataFrame(data_full)
+    count = 0
+    for i in (list_table_hitung):
+        data_perhitungan.insert(count, list_table_hitung_str[count], i, True) 
+        count += 1
+    return (data_perhitungan)
+
+
+def percentage_error(actual, predicted):
+    res = np.empty(actual.shape)
+    for j in range(actual.shape[0]):
+        if actual[j] != 0:
+            res[j] = (actual[j] - predicted[j]) / actual[j]
+        else:
+            res[j] = predicted[j] / np.mean(actual)
+    return res
+
+def mean_absolute_percentage_error(y_true, y_pred): 
+    return np.mean(np.abs(percentage_error(np.asarray(y_true), np.asarray(y_pred)))) * 100
 
 def main():
     # sequenceLength = 310
@@ -527,7 +560,8 @@ def main():
     corpusData = np.concatenate((np.ones((corpusData.shape[0], 1)), corpusData), axis=1)
     skenarioI = int(input("masukkan skenario pilihan : "))
     skenarioP = sk(skenarioI,corpusData)
-
+    rate = float(input("masukkan learning rate : "))
+    
     # 1, dat saham
     print("--------------------------------------------------")
     lstm = LSTMCell(corpusData.shape[1], corpusData.shape[1])
@@ -536,10 +570,10 @@ def main():
     print("training data ",trainingData)
     print(len(trainingData))
     
-    lstm.train(trainingData, numEpochs, 0.02, sequenceLength) # data, numEpochs, learningRate, sequenceLength #s
+    lstm.train(trainingData, numEpochs, rate, sequenceLength,max_ex,min_ex) # data, numEpochs, learningRate, sequenceLength #s
 
-    testingData = skenarioP[1]
-    print("Test error: " + str(lstm.test(testingData, sequenceLength)))
+    # testingData = skenarioP[1]
+    # print("Test error: " + str(lstm.test(testingData, sequenceLength)))
     # #print("banyak data testing ",len(testingData))
    
     originalData = data[3]
@@ -554,43 +588,57 @@ def main():
 
     forecasts = []
 
+    data_full_csv = {}
+    data_perhitungan = pd.DataFrame(data_full_csv) # df 
+
     for sequence in forecastSequences: 
         countForecasts += 1
-        forecast = lstm.forecast(sequence[:-1])
-        forecast *= max_ex[1:]
-        forecast += min_ex[1:]
+        forecast  = lstm.forecast(sequence[:-1])
+        R  = forecast[-1]
+        # print ("squence predict ",R)
+        V_Predict = forecast[0]
+        V_Predict *= max_ex[1:]
+        V_Predict += min_ex[1:]
+        data_sequence_close_NT = sequence[:,2:]
+        sequenceNT = denormal(sequenceLength,sequence,max_ex,min_ex)
+        # list_table_hitung = [sequenceNT.tolist(),data_sequence_close_NT[:,-1].tolist(),
+        # forecast[1].tolist(),forecast[2].tolist(),forecast[3].tolist(),forecast[4].tolist(),forecast[5].tolist(),forecast[6].tolist(),forecast[7].tolist(),forecast[8].tolist()]
+        
+        # block proses
+        list_table_hitung = [forecast[3].tolist(),forecast[4].tolist(),forecast[5].tolist(),forecast[6].tolist(),forecast[7].tolist(),forecast[8].tolist()]
+        
+        list_table_hitung_str = ["C","O","F","I","C_bar","h"]
+        
+        data_perhitungan_new = ex_excel(list_table_hitung,list_table_hitung_str)
+        data_perhitungan = pd.concat([data_perhitungan_new, data_perhitungan]).reset_index(drop = True) 
+        # ----------------------------------------------------------------------------------------------------
 
         label = sequence[-1,2:] * max_ex[1:]
         label += min_ex[1:]
-        #print("label sesudah ",label)
 
-        forecasts.append(forecast)
+        forecasts.append(V_Predict)
         #print("forecasts ",forecasts)
         labels.append(label)
 
-        print('Error: ' + str(np.absolute( label[-1]-forecast[-1] )))
+        print('Error: ' + str(np.absolute( label[-1]-V_Predict[-1] )))
 
-        forecastError += np.absolute(label[-1]-forecast[-1])
-        # print("forecastError ",forecastError, "untuk sequence ke ", countForecasts)
-        forecastError_MSE += (np.absolute(label[-1]-forecast[-1]))**2
-        forecastError_MAPE += (forecastError / label[-1]) * 100
-        data_sequence_close_N = sequence[:,2:]
-         
-        sequenceN = denormal(sequenceLength,sequence,max_ex,min_ex)
+        forecastError += np.absolute(label[-1]-V_Predict[-1])
         
-        print ("urutan yang belum normalisasi ",data_sequence_close_N)
-        print ("urutan yang sudah normalisasi ",sequenceN)
-        print (data_sequence_close_N)
+        forecastError_MSE += (np.absolute(label[-1]-V_Predict[-1]))**2
+        
+        # print_sequence(sequence,max_ex,min_ex)
+
         print ('----------------')
     
+    data_perhitungan.to_csv("datatata.csv") # block preses
+
     print('Average forecast error: (MAD) = ' + str(forecastError / countForecasts))
     print('Average forecast error: (MSE) = ' + str(forecastError_MSE / countForecasts))
-    
+
     forecasts = np.array(forecasts)
     originalData = np.array(originalData) 
     labels = np.array(labels)
 
-    
     times = [i for i in range(forecasts.shape[0])]
     #----------------------------------------------------------------
     waktu = np.array(times)
@@ -602,8 +650,8 @@ def main():
     # print ("forecasts ",forecasts[:,-1])
     prediksii = prediksi.tolist()
 
-    print('Average forecast error: (MSE) = ' + str(mean_squered_error (real, prediksi)))
-    print('Average forecast error: (MAPE) = ' + str(forecastError_MAPE / countForecasts))
+    print('Average forecast error: (MAPE) = ' + str(mean_absolute_percentage_error(real, prediksi))+" %")
+    print('Average Secore Accuracy: ' + str(100 - mean_absolute_percentage_error(real, prediksi))+" %")
     print ()
     print ("banyak data prediksi ",len(forecasts))
     print ("banyak data Real ",len(real))
