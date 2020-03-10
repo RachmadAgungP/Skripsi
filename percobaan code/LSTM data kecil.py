@@ -443,7 +443,7 @@ def main():
     print("--------------------------------------------------")
     lstm = LSTMCell(corpusData.shape[1], corpusData.shape[1] - 2)
     # trainingData = corpusData[:7]
-    trainingData = corpusData[:10]
+    trainingData = corpusData[:-3]
     # print ("training data ", trainingData)
     # data_training_nor = pd.DataFrame(trainingData)
     # data_training_nor.to_csv("data_training.csv")
@@ -456,7 +456,7 @@ def main():
     # print ("min_ex ",min_ex)
     originalData = data[3]
     # print("originalData ",originalData)
-    forecastData = corpusData[-5:]
+    forecastData = corpusData[5:10]
     #print("forecastData ",forecastData)
     forecastSequences = forecastSequenceProducer(forecastData, sequenceLength)
     forecastError = 0.0
@@ -485,7 +485,6 @@ def main():
         #print("label sebelum ",label)
         label += min_ex[1:]
         #print("label sesudah ",label)
-
         forecasts.append(forecast)
         #print("forecasts ",forecasts)
         labels.append(label)

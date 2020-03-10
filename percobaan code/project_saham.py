@@ -102,8 +102,9 @@ class LSTMCell:
         self.numCells = numCells
 
         # Randomly initialise the weight matrix
-        self.W = np.random.random((4 * numCells, inputSize + numCells)) * 2 \
-                        - np.ones((4 * numCells, inputSize + numCells))
+        # self.W = np.random.random((4 * numCells, inputSize + numCells)) * 2 \
+        #                 - np.ones((4 * numCells, inputSize + numCells))
+    
         W = pd.DataFrame(self.W)
         #bobot disimpan .csv
         W.to_csv("P_W.csv",header=False,index=False) 
@@ -520,8 +521,9 @@ def ex_excel(list_table_hitung,list_table_hitung_str):
     data_full = {}
     data_perhitungan = pd.DataFrame(data_full)
     count = 0
+    
     for i in (list_table_hitung):
-        data_perhitungan.insert(count, list_table_hitung_str[count], i, True) 
+        data_perhitungan.insert(count, list_table_hitung_str[count],literal_eval(i), True) 
         count += 1
     return (data_perhitungan)
 
@@ -538,6 +540,7 @@ def percentage_error(actual, predicted):
 def mean_absolute_percentage_error(y_true, y_pred): 
     return np.mean(np.abs(percentage_error(np.asarray(y_true), np.asarray(y_pred)))) * 100
 
+from ast import literal_eval
 def main():
     # sequenceLength = 310
     I_SequenceLength = int(input("masukkan panjang memory: "))
@@ -601,6 +604,7 @@ def main():
         V_Predict += min_ex[1:]
         data_sequence_close_NT = sequence[:,2:]
         sequenceNT = denormal(sequenceLength,sequence,max_ex,min_ex)
+
         # list_table_hitung = [sequenceNT.tolist(),data_sequence_close_NT[:,-1].tolist(),
         # forecast[1].tolist(),forecast[2].tolist(),forecast[3].tolist(),forecast[4].tolist(),forecast[5].tolist(),forecast[6].tolist(),forecast[7].tolist(),forecast[8].tolist()]
         
@@ -714,4 +718,6 @@ def main():
     pl.plot(x,y,'*k')
     pl.show()
 
-if __name__ == "__main__": main()
+if __name__ == "__main__": 
+    main()
+    

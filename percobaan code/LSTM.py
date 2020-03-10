@@ -504,7 +504,7 @@ def main():
     #print(max_ex[2:])
     # #print('Average forecast error: ' + str(forecastError / countForecasts))
     forecasts = np.array(forecasts)
-    # print("prediksi ",forecasts)
+    print("prediksi ",forecasts)
     originalData = np.array(originalData) 
     labels = np.array(labels)
     # print("labels ",labels)
