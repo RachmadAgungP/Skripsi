@@ -9,7 +9,7 @@ def maini(skenarioI, numEpochs, rate):
     sequenceLength = 5
     # numEpochs = int(input("masukkan banyak epoch : "))
 
-    DataSahamStr = 'SMGR.JKq.csv'
+    DataSahamStr = 'data\SMGR.JKq.csv'
     I_DataSaham = SKRIPSI_LSTM.readData(DataSahamStr)
     print ("Data yang dipakai adalah %s"%DataSahamStr)
     data = I_DataSaham
@@ -45,6 +45,8 @@ def maini(skenarioI, numEpochs, rate):
     waktu = hasil_predict[0]
     real = hasil_predict[1]
     prediksi = hasil_predict[2]
+    MAPE = hasil_predict[3]
+    accuracy = hasil_predict[4]
     # x,y=SKRIPSI_LSTM.intersection(waktu,real,waktu,prediksi)
     SKRIPSI_LSTM.pl.grid()
 
@@ -53,6 +55,6 @@ def maini(skenarioI, numEpochs, rate):
     # SKRIPSI_LSTM.pl.plot(waktu, real, 'b')
     # SKRIPSI_LSTM.pl.plot(x,y,'*k')
     # SKRIPSI_LSTM.pl.show()
-    return (originalData,trainingData,forecastData,waktu,real,prediksi)
+    return (originalData,trainingData,forecastData,waktu,real,prediksi,MAPE,accuracy)
 
 

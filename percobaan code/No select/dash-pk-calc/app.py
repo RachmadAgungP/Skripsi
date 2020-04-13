@@ -64,21 +64,14 @@ app.layout = html.Div(
                     children=[html.Img(src=app.get_asset_url("dash-bio-logo.png"))],
                     href="/Portal",
                 ),
-                html.H2("Noncompartmental Pharmacokinetics Analysis"),
-                html.A(
-                    id="gh-link",
-                    children=["View on GitHub"],
-                    href="https://github.com/plotly/dash-sample-apps/tree/master/apps/dash-pk-calc",
-                    style={"color": "white", "border": "solid 1px white"},
-                ),
-                html.Img(src=app.get_asset_url("GitHub-Mark-Light-64px.png")),
+                html.H2("Saham Semen Indonesia"),
             ],
         ),
         html.Div(
             className="container",
             style = {'textAlign': 'center',},
             children=[
-                html.H1(["Harga close Saham"]),
+                html.H1(["Harga close Saham Semen Indonesia"]),
                 html.Div(
                     className="row",
                     style={"margin-bottom": 30},
@@ -208,31 +201,8 @@ app.layout = html.Div(
                         ),
                     ],
                 ),
-                # html.Div(
-                #         children=[
-                #             html.Div(
-                #                 className="row",
-                #                 children=[
-                #                 dash_table.DataTable(
-                #                     id="results-table",
-                #                     style_header=table_header_style,
-                #                     style_data_conditional=[
-                #                         {
-                #                             "if": {"column_id": "param"},
-                #                             "textAlign": "right",
-                #                             "paddingRight": 10,
-                #                         },
-                #                         {
-                #                             "if": {"row_index": "odd"},
-                #                             "backgroundColor": "white",
-                #                         },
-                #                     ],
-                #                 ),
-                #                 ],
-                #             ),
-                #         ],
-                #     ),
-                html.H1(["Prediksi Saham dengan LSTM"]),
+
+                html.H1(["Prediksi Saham Semen Indonesia dengan LSTM"]),
                 html.Div(
                     className="row",
                     style={"margin-top": 30},
@@ -240,6 +210,10 @@ app.layout = html.Div(
                             dcc.Graph(id="results-graph1")
                             ],          
                 ),
+                html.Div(children=["MAPE"]),
+                html.Div(id="MAPE1"),
+                html.Div(children=["Accuracy"]),
+                html.Div(id="ac"),
             ],
         ),
     ],
@@ -266,12 +240,16 @@ def sks(skenario,data_aw,data_sa):
     return (trainingData, forecastData,f_data_sa)
 
 @app.callback(
-    Output("results-graph1", "figure"),
+    [Output("results-graph1", "figure"),
+    Output("MAPE1", 'children'),
+    Output("ac", "children")],
     [Input('submit-button', 'n_clicks')],
     [State("Skenario","value"),State("Epoch","value"),State("rate","value")],
 )
 def update_output1(n_clicks, input1, input2,  input3):
     from_lstm = main_lstm.maini(input1, input2,  input3)
+    MAPE = from_lstm[6]
+    accuracy = from_lstm[7] 
     fig_data = []
 
     fig_data.append(go.Scatter(x= from_lstm[3].tolist(), y= from_lstm[4].tolist(), mode='lines', name='real'))
@@ -304,7 +282,7 @@ def update_output1(n_clicks, input1, input2,  input3):
         ),
     )
 
-    return figure
+    return figure, MAPE, accuracy
 
 @app.callback(
     [Output("data-table", "columns"), Output("data-table", "data")],

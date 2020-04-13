@@ -30,11 +30,11 @@ def _rectangle_intersection_(x1,y1,x2,y2):
 
 def intersection(x1,y1,x2,y2):
     """
-INTERSECTIONS Intersections of curves.
-   Computes the (x,y) locations where two curves intersect.  The curves
-   can be broken with NaNs or have vertical segments.
-usage:
-x,y=intersection(x1,y1,x2,y2)
+    INTERSECTIONS Intersections of curves.
+    Computes the (x,y) locations where two curves intersect.  The curves
+    can be broken with NaNs or have vertical segments.
+    usage:
+    x,y=intersection(x1,y1,x2,y2)
     Example:
     a, b = 1, 2
     phi = np.linspace(3, 10, 100)
@@ -267,6 +267,7 @@ class LSTMCell:
         adaptiveLearningRate = learningRate 
         for epoch in range(numEpochs):
             trainingSequences = sequenceProducer(trainingData, sequenceLength) #data training 
+            # print ("trainingSequences ",next(trainingSequences))
             epochError = 0.0
             counter = 0
             for sequence in trainingSequences:
@@ -334,7 +335,7 @@ class LSTMCell:
                 E = E + 0.5 * np.sum(np.square(self.h[index] - sequence[index, 2:])) # This is the error vector for this sequence
             E = E / sequenceLength
             avgError = avgError + E
-            print('Sequence ' + str(sequence) + ' error: ' + str(avgError / counter))
+            # print('Sequence ' + str(sequence) + ' error: ' + str(avgError / counter))
         avgError = avgError / counter
         
         return avgError
@@ -355,11 +356,10 @@ def readData(filename):
     ex_csv1.to_csv("SMGRW.csv")
 
     data['Date'] =  data['Date'].dt.strftime("%Y%m%d").astype(int)
-    # data['Date'] =  0.00000001
+
     s = data.values.tolist()
     training_data  = np.array(s)
 
-    training_data  = np.array(s)
     print ("training_data ",training_data)
     min_ex = np.amin(training_data, axis=0)
     max_ex = np.amax(training_data, axis=0)
@@ -385,7 +385,7 @@ def sequenceProducer(trainingData, sequenceLength):
     sequenceLength_Tre = 0
     for index in indices:
         sequenceLength_Tre += 1
-        yield trainingData[index:index + sequenceLength+2]
+        yield trainingData[index:index + sequenceLength]
 
 def forecastSequenceProducer(trainingData, sequenceLength):
     for i in range(trainingData.shape[0] - sequenceLength + 1):
@@ -533,135 +533,149 @@ def prediksi(originalData,forecastSequences,lstm,max_ex,min_ex,sequenceLength):
     return (waktu, real, prediksi, MAPE, Accuracy)
 
 
-# def main():
-#     # sequenceLength = 310
-#     I_SequenceLength = int(input("masukkan panjang memory: "))
-#     print ("Panjang memory(sequenceLength) adalah %s" %I_SequenceLength)
-#     sequenceLength = I_SequenceLength
+def main():
+    # sequenceLength = 310
+    # I_SequenceLength = int(input("masukkan panjang memory: "))
+    I_SequenceLength = 5
+    print ("Panjang memory(sequenceLength) adalah %s" %I_SequenceLength)
+    sequenceLength = I_SequenceLength
 
-#     numEpochs = int(input("masukkan banyak epoch : "))
+    numEpochs = 5
+    # numEpochs = int(input("masukkan banyak epoch : "))
 
-#     DataSahamStr = 'SMGR.JKq.csv'
-#     I_DataSaham = readData(DataSahamStr)
-#     print ("Data yang dipakai adalah %s"%DataSahamStr)
-#     data = I_DataSaham
+    DataSahamStr = 'SMGRW.csv'
+    I_DataSaham = readData(DataSahamStr)
+    print(I_DataSaham)
+    print ("Data yang dipakai adalah %s"%DataSahamStr)
+    data = I_DataSaham
 
-#     corpusData = data[0]
+    corpusData = data[0]
 
-#     max_ex = data[1]
-#     min_ex = data[2]
-#     corpusData = np.concatenate((np.ones((corpusData.shape[0], 1)), corpusData), axis=1)
-#     skenarioI = int(input("masukkan skenario pilihan : "))
-#     skenarioP = sk(skenarioI,corpusData)
-#     rate = float(input("masukkan learning rate : "))
+    max_ex = data[1]
+    min_ex = data[2]
+    corpusData = np.concatenate((np.ones((corpusData.shape[0], 1)), corpusData), axis=1)
     
-#     print("--------------------------------------------------")
-#     lstm = LSTMCell(corpusData.shape[1], corpusData.shape[1]-2)
-
-#     trainingData = skenarioP[0]
-#     print("training data ",trainingData)
-#     print(len(trainingData))
+    skenarioI = 4
+    # skenarioI = int(input("masukkan skenario pilihan : "))
+    skenarioP = sk(skenarioI,corpusData)
+    rate = 0.2
+    # rate = float(input("masukkan learning rate : "))
     
-#     lstm.train(trainingData, numEpochs, rate, sequenceLength,max_ex,min_ex) # data, numEpochs, learningRate, sequenceLength #s
+    print("--------------------------------------------------")
+    lstm = LSTMCell(corpusData.shape[1], corpusData.shape[1]-2)
 
-#     # testingData = skenarioP[1]
-#     # print("Test error: " + str(lstm.test(testingData, sequenceLength)))
-#     # #print("banyak data testing ",len(testingData))
+    trainingData = skenarioP[0]
+    print ("ini", trainingData.shape[1])
+    print ("ini 1",corpusData.shape[1])
+    print("training data ",trainingData)
+    print(len(trainingData))
+    
+    lstm.train(trainingData, numEpochs, rate, sequenceLength,max_ex,min_ex) # data, numEpochs, learningRate, sequenceLength #s
+
+    # testingData = skenarioP[1]
+    # print("Test error: " + str(lstm.test(testingData, sequenceLength)))
+    # #print("banyak data testing ",len(testingData))
    
-#     originalData = data[3]
-#     forecastData = skenarioP[1]
-
-#     forecastSequences = forecastSequenceProducer(forecastData, sequenceLength)
-#     forecastError = 0.0
-#     forecastError_MSE = 0.0
-#     forecastError_MAPE = 0.0
-#     countForecasts = 0
-#     labels = []
-
-#     forecasts = []
-
-#     data_full_csv = {}
-#     data_perhitungan = pd.DataFrame(data_full_csv) # df 
-
-#     for sequence in forecastSequences: 
-#         countForecasts += 1
-#         forecast  = lstm.forecast(sequence[:-1])
-#         R  = forecast[-1]
-#         # print ("squence predict ",R)
-#         V_Predict = forecast[0]
-#         V_Predict *= max_ex[1:]
-#         V_Predict += min_ex[1:]
-#         data_sequence_close_NT = sequence[:,2:]
-#         sequenceNT = denormal(sequenceLength,sequence,max_ex,min_ex)
-
-#         # block proses
-#         list_table_hitung = [forecast[1].tolist(),forecast[2].tolist(),forecast[3].tolist(),forecast[4].tolist(),forecast[5].tolist(),forecast[6].tolist(),forecast[7].tolist(),forecast[8].tolist(),forecast[9].tolist()]
-        
-#         list_table_hitung_str = ["I","Z","C","O","F","I_in","C_bar","h","W"]
-        
-#         data_perhitungan_new = ex_excel(list_table_hitung,list_table_hitung_str)
-#         data_perhitungan = pd.concat([data_perhitungan_new, data_perhitungan]).reset_index(drop = True) 
-#         # ----------------------------------------------------------------------------------------------------
-
-#         label = sequence[-1,2:] * max_ex[1:]
-#         label += min_ex[1:]
-
-#         forecasts.append(V_Predict)
-
-#         labels.append(label)
-
-#         print('Error: ' + str(np.absolute( label[-1]-V_Predict[-1] )))
-
-#         forecastError += np.absolute(label[-1]-V_Predict[-1])
-        
-#         forecastError_MSE += (np.absolute(label[-1]-V_Predict[-1]))**2
-        
-#         # print_sequence(sequence,max_ex,min_ex)
-
-#         print ('----------------')
+    originalData = data[3]
     
-#     data_perhitungan.to_csv("datatata.csv") # block preses
+    forecastData = skenarioP[1]
 
-#     print('Average forecast error: (MAD) = ' + str(forecastError / countForecasts))
-#     print('Average forecast error: (MSE) = ' + str(forecastError_MSE / countForecasts))
+    forecastSequences = forecastSequenceProducer(forecastData, sequenceLength)
+    forecastError = 0.0
+    forecastError_MSE = 0.0
+    forecastError_MAPE = 0.0
+    countForecasts = 0
+    labels = []
 
-#     forecasts = np.array(forecasts)
-#     originalData = np.array(originalData) 
-#     labels = np.array(labels)
+    forecasts = []
 
-#     times = [i for i in range(forecasts.shape[0])]
-#     #----------------------------------------------------------------
-#     waktu = np.array(times)
-#     real = np.array(labels[:,-1])
-#     print (real)
-#     reali = real.tolist()
-#     prediksi = np.array(forecasts[:,-1])
-#     print (prediksi)
-#     prediksii = prediksi.tolist()
+    data_full_csv = {}
+    data_perhitungan = pd.DataFrame(data_full_csv) # df 
 
-#     print('Average forecast error: (MAPE) = ' + str(mean_absolute_percentage_error(real, prediksi))+" %")
-#     print('Average Secore Accuracy: ' + str(100 - mean_absolute_percentage_error(real, prediksi))+" %")
-#     print ()
-#     print ("banyak data prediksi ",len(forecasts))
-#     print ("banyak data Real ",len(real))
-#     # MSE = mean_squered_error(real, prediksi)
-#     # print ("The Mean Square Error is: ", MSE)
+    for sequence in forecastSequences: 
+        countForecasts += 1
+        forecast  = lstm.forecast(sequence[:-1])
+        R  = forecast[-1]
+        # print ("squence predict ",R)
+        V_Predict = forecast[0]
+        V_Predict *= max_ex[1:]
+        V_Predict += min_ex[1:]
+        data_sequence_close_NT = sequence[:,2:]
+        sequenceNT = denormal(sequenceLength,sequence,max_ex,min_ex)
 
-#     # rmse = math.sqrt(MSE)
-#     # print ("The Root Mean Square Error is : ", rmse)
+        # block proses
+        list_table_hitung = [forecast[1].tolist(),forecast[2].tolist(),forecast[3].tolist(),forecast[4].tolist(),forecast[5].tolist(),forecast[6].tolist(),forecast[7].tolist(),forecast[8].tolist(),forecast[9].tolist()]
+        
+        list_table_hitung_str = ["I","Z","C","O","F","I_in","C_bar","h","W"]
+        
+        data_perhitungan_new = ex_excel(list_table_hitung,list_table_hitung_str)
+        data_perhitungan = pd.concat([data_perhitungan_new, data_perhitungan]).reset_index(drop = True) 
+        
+        # ----------------------------------------------------------------------------------------------------
+
+        label = sequence[-1,2:] * max_ex[1:]
+        label += min_ex[1:]
+
+        forecasts.append(V_Predict)
+
+        labels.append(label)
+
+        # print('Error: ' + str(np.absolute( label[-1]-V_Predict[-1] )))
+
+        forecastError += np.absolute(label[-1]-V_Predict[-1])
+        
+        forecastError_MSE += (np.absolute(label[-1]-V_Predict[-1]))**2
+        
+        # print_sequence(sequence,max_ex,min_ex)
+
+        # print ('----------------')
     
-#     # mean_absolute_percentage_error(real, prediksi)
-#     # print ("The MAPE is ", mean_absolute_percentage_error(reali, prediksii))
+    data_perhitungan.to_csv("datatata.csv") # block preses
 
-#     x,y=intersection(waktu,real,waktu,prediksi)
-#     pl.grid()
+    print('Average forecast error: (MAD) = ' + str(forecastError / countForecasts))
+    print('Average forecast error: (MSE) = ' + str(forecastError_MSE / countForecasts))
+
+    forecasts = np.array(forecasts)
+    originalData = np.array(originalData) 
+    labels = np.array(labels)
+
+    times = [i for i in range(forecasts.shape[0])]
+    #----------------------------------------------------------------
+    waktu = np.array(times)
     
-#     # r = prediksi
-#     pl.plot(times, forecasts[:,-1], 'r')
-#     pl.plot(times, labels[:,-1], 'b')
-#     pl.plot(x,y,'*k')
-#     pl.show()
+    real = np.array(labels[:,-1])
+    print ("Real ")
+    print (real)
+    reali = real.tolist()
+    
+    print ("Prediksi ") 
+    prediksi = np.array(forecasts[:,-1])
+    print (prediksi)
+    prediksii = prediksi.tolist()
 
-# if __name__ == "__main__": 
-#     main()
+    print ('Average forecast error: (MAPE) = ' + str(mean_absolute_percentage_error(real, prediksi))+" %")
+    print ('Average Secore Accuracy: ' + str(100 - mean_absolute_percentage_error(real, prediksi))+" %")
+    print ()
+    print ("banyak data prediksi ",len(forecasts))
+    print ("banyak data Real ",len(real))
+    # MSE = mean_squered_error(real, prediksi)
+    # print ("The Mean Square Error is: ", MSE)
+
+    # rmse = math.sqrt(MSE)
+    # print ("The Root Mean Square Error is : ", rmse)
+    
+    # mean_absolute_percentage_error(real, prediksi)
+    # print ("The MAPE is ", mean_absolute_percentage_error(reali, prediksii))
+
+    x,y=intersection(waktu,real,waktu,prediksi)
+    pl.grid()
+    
+    # r = prediksi
+    pl.plot(times, forecasts[:,-1], 'r')
+    pl.plot(times, labels[:,-1], 'b')
+    pl.plot(x,y,'*k')
+    pl.show()
+
+if __name__ == "__main__": 
+    main()
     
