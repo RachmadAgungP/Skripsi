@@ -443,13 +443,13 @@ def main():
     print("--------------------------------------------------")
     lstm = LSTMCell(corpusData.shape[1], corpusData.shape[1] - 2)
     # trainingData = corpusData[:7]
-    trainingData = corpusData[:-3]
+    trainingData = corpusData[:7]
     # print ("training data ", trainingData)
     # data_training_nor = pd.DataFrame(trainingData)
     # data_training_nor.to_csv("data_training.csv")
     lstm.train(trainingData, 1, 0.1, sequenceLength) # data, numEpochs, learningRate, sequenceLength #s
 
-    testingData = corpusData[-3:]
+    testingData = corpusData[6:]
     max_ex = data[1]
     # print ("max_ex ",max_ex)
     min_ex = data[2]
@@ -476,9 +476,9 @@ def main():
         print("forecast (h)) ",forecast)
         forecast *= max_ex[1:]
         # 0,113654458	0,085357458	-0,046207997
-        print("max ",forecast)
+      
         forecast += min_ex[1:]
-        print( "min ",forecast)
+ 
         label = sequence[-1,2:] * max_ex[1:]
         # print ("sequence ",sequence[-1,3:])
         # print("sequence[-1,3:] ",sequence[-1,2:])

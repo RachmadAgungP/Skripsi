@@ -181,15 +181,118 @@ def denormal (sequenceLength,sequence,max_ex,min_ex):
         sequenceN.append(data_sequence_close_DN[0])
     return (np.array(sequenceN))
 
-def ex_excel(list_table_hitung,list_table_hitung_str):
-    data_full = {}
-    data_perhitungan = pd.DataFrame(data_full)
+# def ex_excel(list_table_hitung,list_table_hitung_str):
+#     data_full = {}
+#     data_perhitungan = pd.DataFrame(data_full)
+#     count = 0
+#     for i in (list_table_hitung):
+#         data_perhitungan.insert(count, list_table_hitung_str[count],i, True) 
+#         count += 1
+#     # for sub_e in i.split(","):
+#     #     new_list.append(list(sub_e)) 
+#     # print ("list -> ",data_perhitungan)
+#     return (data_perhitungan)
+
+def tampung_hitung_manual(jenis_proses,data):
+    if jenis_proses == "forward":
+        data_full = {}
+        data_perhitungan = pd.DataFrame(data_full) 
+        var_hidden_layer = data
+        list_table_hitung_str = ["I","Z","C","O","F","I_in","C_bar","h","W"]
+    else:
+        data_full = {}
+        data_perhitungan = pd.DataFrame(data_full) 
+        var_hidden_layer = data
+        list_table_hitung_str = ["dE_dW_t", "dE_dh_tminus1", "dE_dc_tminus1", "dE_do_t", "dE_dc_t", "dE_di_t", "dE_dcbar_t", "dE_df_t","dE_dzcbar_t","dE_dzi_t","dE_dzf_t","dE_dzo_t","dE_dz_t","dE_dI_t"]
+
+    vel_hidden_layer = []
     count = 0
-    new_list = []
-    for i in (list_table_hitung):
-        data_perhitungan.insert(count, list_table_hitung_str[count],i, True) 
+    for i in var_hidden_layer:
+        data_perhitungan.insert(count, list_table_hitung_str[count],np.transpose(np.transpose(i)).tolist(), True) 
         count += 1
-    # for sub_e in i.split(","):
-    #     new_list.append(list(sub_e)) 
-    # print ("list -> ",data_perhitungan)
-    return (data_perhitungan)
+    return data_perhitungan
+
+def view_hitung_manual(jenis_proses,data_t):
+    if jenis_proses == "forward":
+        print ("PROSES FORWARD")
+        
+        list_table_hitung_str = ["I","Z","C","O","F","I_in","C_bar","h","W"]
+        if (data_t == data_t["I"] or i == "Z" or i == "W"):
+            view = pd.DataFrame(data=data_t.tolist(),columns=["C","i","f","o"]).T
+            return(view)
+        else:
+            view = pd.DataFrame(data=data_t.tolist(),columns=[i]).T
+            return(view)
+    else:
+        print ("PROSES BACKWARD")
+        
+        list_table_hitung_str = ["dE_dW_t", "dE_dh_tminus1", "dE_dc_tminus1", "dE_do_t", "dE_dc_t", "dE_di_t", "dE_dcbar_t", "dE_df_t","dE_dzcbar_t","dE_dzi_t","dE_dzf_t","dE_dzo_t","dE_dz_t","dE_dI_t"]
+        for i in list_table_hitung_str:
+            if i == "dE_dW_t":
+                view = pd.DataFrame(data=data_t[i].tolist(),columns=["C","i","f","o"]).T
+                return(view)
+            elif i == "dE_dz_t":
+                view = pd.DataFrame(data=data_t[i].tolist(),columns=["dE_dzcbar_t", "dE_dzi_t", "dE_dzf_t", "dE_dzo_t"]).T
+                return(view)
+            elif i == "dE_dI_t":
+                view = pd.DataFrame(data=data_t[i].tolist(),columns=["bias", "date", "x(close)", "h(Close)"]).T
+                return(view)
+            else:
+                view = pd.DataFrame(data=data_t[i].tolist(),columns=[i]).T
+                return(view)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+       
+            
+            
+            
+            
+            
+            
+            
+            
+     
+     
+     
+    
+    
+     
+    
+    
+    
+    
