@@ -48,15 +48,11 @@ class LSTMCell:
         self.z = []
 
     # x is the input vector (including bias term), returns output h
-    def forwardStep(self, x, jenis):
-        if jenis =="prediksi":
-            models = pd.read_csv("model.csv")
-            model = models.values
-        else:
-            model = self.W
+    def forwardStep(self, x):
+       
         I = np.concatenate((x, self.h[-1])) #mengabungkan
         self.I.append(I) 
-        z = np.dot(model, I)
+        z = np.dot(self.W, I)
         self.z.append(z)
         # Compute the candidate value vector
         C_bar = np.tanh(z[0:self.numCells])
@@ -78,10 +74,9 @@ class LSTMCell:
         # Compute the new output
         h = np.multiply(o, np.tanh(C))
         self.h.append(h)
-        return (h,C,o,f,i,C_bar,z,I,model)
+        return (h,C,o,f,i,C_bar,z,I,self.W)
     # x = trainingSequences (data training)
-    def forwardPass(self, x,jenis):
-        
+    def forwardPass(self, x):
         self.h = []
         self.C = []
 
@@ -107,19 +102,19 @@ class LSTMCell:
         self.o.append(np.zeros(numCells)) 
         self.I.append(np.zeros(numCells)) 
         self.z.append(np.zeros(numCells)) 
-        O_W= [self.forwardStep(x_t,jenis)[8] for x_t in x]
+        O_W= [self.forwardStep(x_t)[8] for x_t in x]
 
-        O_I= [self.forwardStep(x_t,jenis)[7] for x_t in x]
+        O_I= [self.forwardStep(x_t)[7] for x_t in x]
     
         P_I = pd.DataFrame(self.I)
             
-        O_z= [self.forwardStep(x_t,jenis)[6] for x_t in x]
-        O_c= [self.forwardStep(x_t,jenis)[1] for x_t in x]
-        O_o= [self.forwardStep(x_t,jenis)[2] for x_t in x]
-        O_f= [self.forwardStep(x_t,jenis)[3] for x_t in x]
-        O_in= [self.forwardStep(x_t,jenis)[4] for x_t in x]
-        O_c_bar= [self.forwardStep(x_t,jenis)[5] for x_t in x]
-        O_h = [self.forwardStep(x_t,jenis)[0] for x_t in x]
+        O_z= [self.forwardStep(x_t)[6] for x_t in x]
+        O_c= [self.forwardStep(x_t)[1] for x_t in x]
+        O_o= [self.forwardStep(x_t)[2] for x_t in x]
+        O_f= [self.forwardStep(x_t)[3] for x_t in x]
+        O_in= [self.forwardStep(x_t)[4] for x_t in x]
+        O_c_bar= [self.forwardStep(x_t)[5] for x_t in x]
+        O_h = [self.forwardStep(x_t)[0] for x_t in x]
         
         return (O_I,O_z,O_c,O_o,O_f,O_in,O_c_bar,O_h,O_W)
 
@@ -244,15 +239,14 @@ class LSTMCell:
         data_perhitungan_training_optimasi_csv = {}
         data_perhitungan_training_optimasi = pd.DataFrame(data_perhitungan_training_optimasi_csv) # df 
 
-        error_t=[]
+
         for epoch in range(numEpochs):
             trainingSequences = sequenceProducer(trainingData, sequenceLength) #data training 
             epochError = 0.0
             counter = 0
-            
             for sequence in trainingSequences:
                 counter += 1
-                forecast_h = self.forwardPass(sequence[:],"no_prediksi")
+                forecast_h = self.forwardPass(sequence[:])
 
                 data_new_training = menampilkan.tampung_hitung_manual("data",[[sequence[:]]])
                 data_training = pd.concat([data_new_training, data_training]).reset_index(drop = True) 
@@ -265,8 +259,7 @@ class LSTMCell:
                 data_perhitungan_training = pd.concat([data_perhitungan_new_training, data_perhitungan_training]).reset_index(drop = True) 
                 # --------------------------------------------------------------------------
 
-                result = self.BPTT(sequence[:,2:])
-                
+                result = self.BPTT(sequence[1:,2:])
                 backward = [result[2],result[3],result[4],result[5],result[6],result[7],result[8],result[9],result[10],result[11],result[12],result[13],result[14],result[15],result[16],result[17]]
                 # melihat hasil perhitungan secara detail 
                 data_perhitungan_new_training_BPTT = menampilkan.tampung_hitung_manual("backward",backward)
@@ -296,20 +289,14 @@ class LSTMCell:
                 data_perhitungan_training_optimasi = pd.concat([data_perhitungan_new_optimasi, data_perhitungan_training_optimasi]).reset_index(drop = True) 
 
                 epochError += E
-            error_t.append([epoch,epochError / counter])
+            
             print('Epoch ' + str(epoch) + ' error: ' + str(epochError / counter))
-        tbl_error = pd.DataFrame(data = error_t,columns=["urutan","error"])
-        tbl_error.to_csv("tbl_error.csv")
-        model = pd.DataFrame(self.W)
-        model.to_csv("model.csv",index=False)
-        print ("tbl_error ",tbl_error)
-        return (tbl_error)
-        # return (optimasi,data_training,data_perhitungan_training,data_perhitungan_training_BPTT,data_perhitungan_training_update_bobot,data_perhitungan_training_optimasi)
+        return (optimasi,data_training,data_perhitungan_training,data_perhitungan_training_BPTT,data_perhitungan_training_update_bobot,data_perhitungan_training_optimasi)
 
     # needs a parameter about how far to forecast, and needs to use its own
     # results as inputs to the next thing, to keep forecasting
     def forecast(self, forecastingData):
-        forward = self.forwardPass(forecastingData,"prediksi")
+        forward = self.forwardPass(forecastingData)
         f_l = np.transpose(np.transpose(forward[0]))
         f_z = np.transpose(np.transpose(forward[1]))
         f_c = np.transpose(np.transpose(forward[2]))
@@ -338,15 +325,16 @@ class LSTMCell:
         counter = 0
         for sequence in testingSequences:
             counter += 1
-            self.forwardPass(sequence[:],"non_prediksi")
+            self.forwardPass(sequence[:])
             E = 0.0
             for j in range(sequenceLength - 1):
                 index = sequenceLength - j - 1
                 E = E + 0.5 * np.sum(np.square(self.h[index] - sequence[index, 2:])) # This is the error vector for this sequence
             E = E / sequenceLength
             avgError = avgError + E
+            print('Sequence ' + str(sequence) + ' error: ' + str(avgError / counter))
         avgError = avgError / counter
-        print(' error: ' + str(avgError / counter))
+        
         return avgError
 
 import datetime as dt
@@ -395,11 +383,11 @@ def sequenceProducer(trainingData, sequenceLength):
     indices = [i for i in range(0, trainingData.shape[0] - sequenceLength + 1, sequenceLength)] #inisial untuk training
     random.shuffle(indices)
     for index in indices:
-        yield trainingData[index:index + sequenceLength]
+        yield trainingData[index:index + sequenceLength+2]
 
-def forecastSequenceProducer(forcastData, sequenceLength):
-    for i in range(forcastData.shape[0] - sequenceLength + 1):
-        yield forcastData[i:i + sequenceLength]
+def forecastSequenceProducer(trainingData, sequenceLength):
+    for i in range(trainingData.shape[0] - sequenceLength + 1):
+        yield trainingData[i:i + sequenceLength]
     
 def sk(skenario,data_sa):
     if (skenario == 1):
@@ -450,7 +438,7 @@ def prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenc
 
     for sequence in forecastSequences: 
         countForecasts += 1
-        forecast  = lstm.forecast(sequence[:])
+        forecast  = lstm.forecast(sequence[:-1])
         V_Predict = forecast[0]
         V_Predict *= max_ex[1:]
         V_Predict += min_ex[1:]
@@ -473,18 +461,24 @@ def prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenc
         
         wektu = sequence[-1,1] * max_ex[:-1]
         wektu += min_ex[:-1]
-        # print("waktu",datetime.datetime.strptime(str(int(wektu)), '%Y%m%d'))
+        print("waktu",datetime.datetime.strptime(str(int(wektu)), '%Y%m%d'))
         waktu.append(datetime.datetime.strptime(str(int(wektu)), '%Y%m%d'))
 
         forecasts.append(V_Predict)
 
         labels.append(label)
 
-        # print('Error: ' + str(np.absolute( label[-1]-V_Predict[-1] )))
+        print('Error: ' + str(np.absolute( label[-1]-V_Predict[-1] )))
 
         forecastError += np.absolute(label[-1]-V_Predict[-1])
         
         forecastError_MSE += (np.absolute(label[-1]-V_Predict[-1]))**2
+        
+
+        print ('----------------')
+
+    print('Average forecast error: (MAD) = ' + str(forecastError / countForecasts))
+    print('Average forecast error: (MSE) = ' + str(forecastError_MSE / countForecasts))
 
     forecasts = np.array(forecasts)
     forecast_ori_Sequences = np.array(forecast_ori_Sequences) 
@@ -494,16 +488,23 @@ def prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenc
     # #----------------------------------------------------------------
     # waktu = np.array(times)
     real = np.array(labels[:,-1])
-
+    print (real)
     reali = real.tolist()
     prediksi = np.array(forecasts[:,-1])
-
+    print (prediksi)
     tbl_lstm = pd.DataFrame({"times":times,"real":real,"prediksi":prediksi})
-
+    print (tbl_lstm)
     prediksii = prediksi.tolist()
     MAPE = mean_absolute_percentage_error(real, prediksi)
     Accuracy = 100 - mean_absolute_percentage_error(real, prediksi)
     MSE = mse(real, prediksi)
+    print('Average forecast error: (MSE) = ' + str(mse(real, prediksi)))
+    print('Average forecast error: (MAPE) = ' + str(mean_absolute_percentage_error(real, prediksi))+" %")
+    print('Average Secore Accuracy: ' + str(100 - mean_absolute_percentage_error(real, prediksi))+" %")
+    
+    print ()
+    print ("banyak data prediksi ",len(forecasts))
+    print ("banyak data Real ",len(real))
     
     return (times, real, prediksi, MAPE, Accuracy,MSE, tbl_lstm)
 
