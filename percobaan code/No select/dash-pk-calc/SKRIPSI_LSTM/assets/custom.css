@@ -137,3 +137,34 @@ th {
     sans-serif;
   font-size: 12px;
 }
+
+body {
+  background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-repeat: repeat-x;
+}
+
+.bodyy {
+  /* background: -webkit-gradient(linear, left top, right top, from(#84d9d2), to(#07cdae)) !important; */
+  background-image: linear-gradient(to top, #6a85b6 0%, #bac8e0 100%);
+  background-repeat: repeat-x;
+  color: #fff; 
+}
+
+.footy {
+  /* background: -webkit-gradient(linear, left top, right top, from(#84d9d2), to(#07cdae)) !important; */
+  background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-repeat: repeat-x;
+  color: #fff; 
+}
+
+.content{
+  background-image: linear-gradient(to top, #09203f 0%, #537895 100%);
+  background-repeat: repeat-x;
+  color: #fff; 
+}
+
+.card-img-absolute {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 30%; }

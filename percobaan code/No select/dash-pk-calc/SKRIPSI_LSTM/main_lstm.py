@@ -2,7 +2,7 @@ import SKRIPSI_LSTM
 import numpy as np
 import pandas as pd
 
-def maini(skenarioI, numEpochs, rate):
+def maini(skenarioI, numEpochs, rate, sequenceLength_prediksi):
     # I_SequenceLength = int(input("masukkan panjang memory: "))
     # print ("Panjang memory(sequenceLength) adalah %s" %I_SequenceLength)
     # sequenceLength = I_SequenceLength
@@ -56,6 +56,8 @@ def maini(skenarioI, numEpochs, rate):
     
     forecastSequences = SKRIPSI_LSTM.forecastSequenceProducer(forecastData, sequenceLength)
 
+    # print ("ini",hasil_Mypredict)
+
     forecast_ori_Sequences = SKRIPSI_LSTM.forecastSequenceProducer(data_no_normalisasi[1], sequenceLength)
     # pred
     hasil_predict = SKRIPSI_LSTM.prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenceLength)
@@ -71,16 +73,26 @@ def maini(skenarioI, numEpochs, rate):
     tbl_hasil = hasil_predict[6]
     # x,y=SKRIPSI_LSTM.intersection(waktu,real,waktu,prediksi)
     SKRIPSI_LSTM.pl.grid()
-    print(trainingData_no_normalisasi)
-    
-    print(forecastData_no_normalisasi)
+    print(tbl_hasil)
+    # de = SKRIPSI_LSTM.denormalisasi(forecastSequences,max_ex,min_ex)
+    # print (de)
+    forecastSequences1 = SKRIPSI_LSTM.forecastSequenceProducer(forecastData, sequenceLength)
+
+    hasil_Mypredict = SKRIPSI_LSTM.myprediksi(forecastSequences1,lstm,max_ex,min_ex,sequenceLength_prediksi)
     # r = prediksi
     # SKRIPSI_LSTM.pl.plot(waktu, prediksi, 'r')
     # SKRIPSI_LSTM.pl.plot(waktu, real, 'b')
     # SKRIPSI_LSTM.pl.plot(x,y,'*k')
     # SKRIPSI_LSTM.pl.show()
     return (originalData,trainingData,forecastData,waktu,real,prediksi,MAPE,accuracy,MSE,trainingData_no_normalisasi,forecastData_no_normalisasi,originalData_no_normalisasi,tbl_hasil,h_error)
-# maini(5, 1, 0.1)
+
+maini(3, 1, 0.1,50)
+# timeData = [1,2,3,4,5,6]
+# for i in range(3-1):
+#     nextInput = np.hstack(([1], timeData[i], 90))
+#     print (nextInput)
+
+
 def maina(skenarioI):
     sequenceLength = 5
     # numEpochs = int(input("masukkan banyak epoch : "))

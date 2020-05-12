@@ -322,14 +322,16 @@ class LSTMCell:
         return (f_h[-1],f_l,f_z,f_c,f_o,f_f,f_i,f_c_bar,f_h,f_W)
 
     def forecastKSteps(self, forecastingData, timeData, k):
-        self.forwardPass(forecastingData)
-
-        for i in range(k - 1):
-            lastForecast = self.h[-1]
-            nextInput = np.concatenate(([1], timeData[i], self.h[-1]), axis=1)
-            self.forwardStep(nextInput)
-
-        return np.transpose(np.transpose(self.h[-k:]))
+        forward = self.forwardPass(forecastingData,"prediksi")
+        f_h = np.transpose(np.transpose(forward[7]))
+        for i in range(k-1):
+            lastForecast = f_h[-1]
+            hh = f_h[-1].tolist()
+            nextInput = np.hstack(([1], timeData[i], hh[0]))
+            self.forwardStep(nextInput,"prediksi")
+        
+        # return np.transpose(np.transpose(self.h[-k:]))
+        return (f_h[:])
 
     # needs fixing
     def test(self, testingData, sequenceLength):
@@ -430,6 +432,21 @@ def mean_absolute_percentage_error(y_true, y_pred):
 def mse(y_true, y_pred):
   y_true, y_pred = np.array(y_true), np.array(y_pred)
   return np.mean(np.abs((y_true - y_pred))**2 / y_true)
+def denormalisasi(data,max_ex,min_ex):
+    waktus = []
+    labels = []
+    for sequence in data:
+        label = sequence[2] * max_ex[1:]
+        label += min_ex[1:]
+        labels.append(label)
+        
+        wektu = sequence[0] * max_ex[:-1]
+        wektu += min_ex[:-1]
+        waktus.append(datetime.datetime.strptime(str(int(wektu)), '%Y%m%d'))
+    
+    tbl_denormal = pd.DataFrame({"times":waktus,"real":labels})
+    return tbl_denormal
+    
 
 def prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenceLength):
     forecastError = 0.0
@@ -447,14 +464,15 @@ def prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenc
 
     data_full_testing_csv = {}
     data_perhitungan_testing = pd.DataFrame(data_full_testing_csv) # df 
-
+    
     for sequence in forecastSequences: 
         countForecasts += 1
         forecast  = lstm.forecast(sequence[:])
+        
+
         V_Predict = forecast[0]
         V_Predict *= max_ex[1:]
         V_Predict += min_ex[1:]
-        data_sequence_close_NT = sequence[:,2:]
 
         # block proses
         forward = [forecast[1],forecast[2],forecast[3],forecast[4],forecast[5],forecast[6],forecast[7],forecast[8],forecast[9]]
@@ -499,11 +517,70 @@ def prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenc
     prediksi = np.array(forecasts[:,-1])
 
     tbl_lstm = pd.DataFrame({"times":times,"real":real,"prediksi":prediksi})
-
+    tbl_lstm.to_csv("tbl_testing.csv")
     prediksii = prediksi.tolist()
     MAPE = mean_absolute_percentage_error(real, prediksi)
     Accuracy = 100 - mean_absolute_percentage_error(real, prediksi)
     MSE = mse(real, prediksi)
-    
+    print ("tbl")
+    print (tbl_lstm[-sequenceLength:])
     return (times, real, prediksi, MAPE, Accuracy,MSE, tbl_lstm)
 
+def myprediksi(forecastSequences,lstm,max_ex,min_ex,sequenceLength):
+    data_myprediksi = []
+    for sequence in forecastSequences: 
+        data_myprediksi.append(sequence[:])
+    
+    data = data_myprediksi[-1].tolist()
+    print ("awal",data)
+    countForecasts = 0
+    waktu = []
+
+    forecasts = []
+
+    data_testing_csv = {}
+    data_testing = pd.DataFrame(data_testing_csv) # df 
+
+    data_full_testing_csv = {}
+    data_perhitungan_testing = pd.DataFrame(data_full_testing_csv) # df 
+    forecasts.append(data[-1])
+    wektu = data[-1][1] * max_ex[:-1]
+    wektu += min_ex[:-1]
+    waktu = wektu[0]
+    print ("waktu", waktu)
+    
+    
+    e = []
+    for i in range(sequenceLength+1):
+        e.append(waktu+i)
+
+    for i in range(1,sequenceLength+1):
+        print ("ini data",data[-sequenceLength:])
+        forecast  = lstm.forecast(data[-sequenceLength:])
+        V_Predict = forecast[0].tolist()
+        waktuu = waktu+i
+        waktuu -= min(e)
+        waktuu /= max(e)
+        data.append([1, waktuu, V_Predict[0]])
+        forecasts.append(data[-1])
+    
+    for y in range(sequenceLength+1):
+        
+        forecasts[y][-1] *= max_ex[1]
+        forecasts[y][-1] += min_ex[1]
+    
+        if y == 0:
+            forecasts[y][1] *= max_ex[:-1]
+            forecasts[y][1] += min_ex[:-1]
+            forecasts[y][1] = datetime.datetime.strptime(str(int(forecasts[y][1])), '%Y%m%d')
+        else:
+            forecasts[y][1] *= max(e)
+            forecasts[y][1] += min(e)
+            forecasts[y][1] = datetime.datetime.strptime(str(int(forecasts[y][1])), '%Y%m%d')
+    tbl_prediksi = pd.DataFrame(forecasts,columns=["bias","date","close"])
+
+    print ("prediksinya adalah ",forecasts)
+
+    print (tbl_prediksi[["date","close"]])
+    return tbl_prediksi[["date","close"]]
+    

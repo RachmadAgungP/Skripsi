@@ -25,7 +25,7 @@ Header_Data_Saham = dbc.CardHeader([
                         html.Div(
                             style={"float": "right","margin-left":"10px"},
                             children=[
-                            html.Button(className="btn btn-success",id="submit-button1", n_clicks=0, children='Skenario'),
+                            html.Button(className="btn content",id="submit-button1", n_clicks=0, children='Skenario'),
                         ]),
                         html.Div(
                             style={"float": "right"},
@@ -43,20 +43,20 @@ Header_Data_Saham = dbc.CardHeader([
                 ])
 
 Header_training = dbc.CardHeader([
-                        html.Div(
+                html.Div(
                             style={"float": "left"},
                             children=[
                             html.H5(["Training Data"]),
-                        ]), 
-                        html.Div(
-                            style={"float": "right","margin":"10px"},
-                            children=[
-                            html.Button(className="btn btn-success",id='submit-button2', n_clicks=0, children='Training'),
                         ]),
+                html.Div(
+                            style={"float": "right","margin-left":"10px"},
+                            children=[
+                            html.Button(className="btn content",id='submit-button2', n_clicks=0, children='Training'),
+                        ]), 
+                dbc.Row(
+                        style={"float":"right"},
+                        children=[
                         
-                            dbc.Row(
-                                style={"float":"right","margin":"10px"},
-                                children=[
                                     html.Label(["Rate :"]),
                                     dbc.Col(
                                     children=[
@@ -73,6 +73,7 @@ Header_training = dbc.CardHeader([
                                     ]),
                                     html.Label(["Epoch :"]),
                                     dbc.Col(
+                                    style={"margin-left":"5px"},
                                     children=[
                                         dcc.Input(
                                             id="Epoch",
@@ -82,8 +83,7 @@ Header_training = dbc.CardHeader([
                                             # value=1,
                                             min=1,
                                             ),
-                                        ])
-                                    
+                                        ]),      
                         ]),
                 ])
 
@@ -96,7 +96,33 @@ Header_testing = dbc.CardHeader([
                         html.Div(
                             style={"float": "right","margin-left":"10px"},
                             children=[
-                            html.Button(className="btn btn-success",id="submit-button3", n_clicks=0, children='Testing'),
+                            html.Button(className="btn content",id="submit-button3", n_clicks=0, children='Testing'),
+                        ]),
+                ])
+
+Header_prediksi = dbc.CardHeader([
+                        html.Div(
+                            style={"float": "left"},
+                            children=[
+                            html.H5(["Prediksi Data"]),
+                        ]), 
+                        html.Div(
+                            style={"float": "right","margin-left":"10px"},
+                            children=[ 
+                            html.Button(className="btn content",id="submit-button4", n_clicks=0, children='Prediksi'),
+                        ]),
+                        html.Div(
+                            style={"float": "right"},
+                            children=[
+                            dcc.Input(
+                                id="prediksi_ke",
+                                placeholder="Enter a value...",
+                                type="number",
+                                # value=5,
+                                debounce=True,
+                                # disabled=True,
+                                min=1,
+                            ),
                         ]),
                 ])
 
@@ -117,22 +143,31 @@ app.layout = html.Div(
             color="dark",
             dark=True,
         ),
-        dbc.Container([  
+
             html.Div(
+                style={"margin":"60px","margin-left":"130px","margin-right":"130px"},
                 className="text-center",
-                children=[
+                children=[ 
                     dbc.Card(
-                        className="text-body",
+                        
+                        className="shadow rounded text-white",
                         children=[
+                            dbc.CardHeader(
+                            className="bodyy",
+                            children=[
+                            html.Img(src="https://www.bootstrapdash.com/demo/purple-admin-free/assets/images/dashboard/circle.svg", className="card-img-absolute", alt="circle-image"),
                             html.H2(["PREDIKSI HARGA SAHAM"]),
-                            html.H5(["Menggunakan Metode LSTM (Long Short Term Memory)"]),
+                            ]),
+                            dbc.CardBody(children=[
+                            # html.H5(["Metode LSTM (Long Short Term Memory)"]),
                             # Data Saham Semen Indonesia
                             dbc.Row(
                                 className="text-body",
                                 children=[
                                     dbc.Col(className="col-sm-12",
                                     children=[
-                                    dbc.Card([
+                                    dbc.Card(
+                                        className="bodyy shadow rounded",children=[
                                         Header_Data_Saham,
                                         html.Div(id="data")#Body_Data_Saham
                                         ]),
@@ -141,7 +176,7 @@ app.layout = html.Div(
                                     # Training
                                     dbc.Col(className="col-sm-12",
                                     children=[
-                                    dbc.Card([
+                                    dbc.Card(className="bodyy shadow rounded",children=[
                                         Header_training,
                                         html.Div(id="data2")# Body_training
                                         ]),
@@ -150,23 +185,32 @@ app.layout = html.Div(
                                     # Testing 
                                     dbc.Col(className="col-sm-12",
                                     children=[
-                                    dbc.Card([
+                                    dbc.Card(className="bodyy shadow rounded",children=[
                                         Header_testing,
                                         html.Div(id="data3")# Body_testing
                                         ]),
-                                    ],style={"margin-bottom":"15px"}),  
+                                    ],style={"margin-bottom":"15px"}), 
+
+                                    # Prediksi 
+                                    dbc.Col(className="col-sm-12",
+                                    children=[
+                                    dbc.Card(className="bodyy shadow rounded",children=[
+                                        Header_prediksi,
+                                        html.Div(id="data4")# Body_prediksi
+                                        ]),
+                                    ],style={"margin-bottom":"15px"}), 
                                 ],
                                 style={"margin": "10px"},
                                 ),
+                                ]),
+                                dbc.CardFooter(className="footy text-right text-dark",children=[
+                                    html.Div(["Rachmad Agung Pambudi // 160411100032"])
+                                ])
                             
                             ],
-                            style={"margin-top": "20px"},
+                            
                         ),
-
-                    ],
-                ),
         ],
-        style={"margin-top":"-50px"},
         ),
     ],
 )
@@ -274,6 +318,25 @@ def main3(btn3,input1):
             print (button_id)
             r3 = test(btn3, input1)
             return (r3)
+
+@app.callback(Output("data4", "children"),
+              [Input('submit-button4', 'n_clicks')],
+               [State("prediksi_ke","value"),State("Skenar","value")])
+
+def main4(btn4,input4,input1):
+    ctx = dash.callback_context
+    if input4 is None  :
+        raise dash.exceptions.PreventUpdate
+
+    if not ctx.triggered:
+        button_id = 'No clicks yet'
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+        if button_id == 'submit-button4':
+            print (button_id)
+            r4 = prediksi(btn4,input4,input1)
+            return (r4)
 
 def data(n_clicks, input1):
     
@@ -421,10 +484,11 @@ def test(n_clicks,value):
                                             dbc.Card(className="text-body",children=[dcc.Graph(figure=figure_data_testing,style={"margin":"8px"})]), 
                                         ]),
                                     dbc.Col(
+                                        style={"margin-top":"20px"},
                                         className="col-sm-12",
                                         children=[
                                             dbc.Card([
-                                                dcc.Graph(figure=figure_hasil,style={"margin-top":"15px"}),
+                                                dcc.Graph(figure=figure_hasil),
                                             dbc.Row([
                                                 dbc.Col([html.Div(children=["MAPE"]),dbc.Card([html.Div([MAPE])]),
                                                 ]),
@@ -447,6 +511,41 @@ def test(n_clicks,value):
                     ])
                 ])
     return Body_testing
+
+def prediksi(n_clicks,input4,value):
+    skenarioP = SKRIPSI_LSTM.sk(value,corpusData)
+    forecastData = skenarioP[1]
+    forecastSequences = SKRIPSI_LSTM.forecastSequenceProducer(forecastData, sequenceLength)
+
+    hasil_Mypredict = SKRIPSI_LSTM.myprediksi(forecastSequences,lstm,max_ex,min_ex,input4)
+
+    fig_data_hasil_Mypredict = []
+    fig_data_hasil_Mypredict.append(go.Scatter(x= hasil_Mypredict["date"].tolist(), y= hasil_Mypredict["close"].tolist(), mode='lines', name='prediksi'))  
+    figure_hasil = figur(fig_data_hasil_Mypredict)
+
+    data3 = hasil_Mypredict.to_dict('rows')
+    columns3 = [{"name":i,"id":i,} for i in (hasil_Mypredict.columns)]
+    tbl_hasil = dt.DataTable(data=data3, columns=columns3,page_size=5,style_cell={'textAlign': 'center'},style_header={
+        'backgroundColor': 'rgb(230, 230, 230)',
+        'fontWeight': 'bold'
+    })
+
+    Body_prediksi = dbc.CardBody(
+                    className="text-body",
+                    children=[
+                        dbc.Row([
+                            dbc.Col(className="col-sm-4 text-body",
+                                    children=[
+                                    dbc.Card(className="text-body",
+                                        children=[html.H3("Data Prediksi"),html.Div([tbl_hasil],style={"margin-right":"30px","margin-left":"30px"})]), 
+                                        ]),
+                                    dbc.Col(className="col-sm-8 text-body",
+                                        children=[
+                                            dbc.Card(className="text-body",children=[dcc.Graph(figure=figure_hasil,style={"margin":"8px"})]), 
+                                        ]),
+                    ])
+                ])
+    return Body_prediksi
 
 
 if __name__ == "__main__":
