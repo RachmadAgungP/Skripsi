@@ -47,7 +47,7 @@ server = app.server
 APP_PATH = str(pl.Path(__file__).parent.resolve())
 import datetime as dt
 
-pkdata = pd.read_csv(os.path.join(APP_PATH, os.path.join("data", "SMGRW.csv")))
+pkdata = pd.read_csv(os.path.join(APP_PATH, os.path.join("data", "BTC-USD1.csv")))
 pkdata['Date'] = pd.to_datetime(pkdata['Date'])
 pkdata.index = pkdata['Date']
 n_subjects = len(pkdata.subject_index.unique())
@@ -64,14 +64,14 @@ app.layout = html.Div(
                     children=[html.Img(src=app.get_asset_url("dash-bio-logo.png"))],
                     href="/Portal",
                 ),
-                html.H2("Saham Semen Indonesia"),
+                html.H2("bitcoin"),
             ],
         ),
         html.Div(
             className="container",
             style = {'textAlign': 'center',},
             children=[
-                html.H1(["Harga close Saham Semen Indonesia"]),
+                html.H1(["Harga close bitcoin"]),
                 html.Div(
                     className="row",
                     style={"margin-bottom": 30},
@@ -113,7 +113,7 @@ app.layout = html.Div(
                                                     id="Skenario",
                                                     placeholder="Enter a value...",
                                                     type="number",
-                                                    value=1,
+                                                    value=3,
                                                     # debounce=True,
                                                     min=1,
                                                     max=3,
@@ -149,21 +149,21 @@ app.layout = html.Div(
                                             ]
                                         ),
                                         
-                                        html.Label(
-                                            [
-                                                html.Div(["Subjects"]),
-                                                dcc.Input(
-                                                    style={'width': 80},
-                                                    id="subjects-input",
-                                                    placeholder="Enter a value...",
-                                                    type="number",
-                                                    value=n_subjects,
-                                                    # debounce=True,
-                                                    min=1,
-                                                    max=48,
-                                                ),
-                                            ]
-                                        ),
+                                        # html.Label(
+                                        #     [
+                                        #         html.Div(["Subjects"]),
+                                        #         dcc.Input(
+                                        #             style={'width': 80},
+                                        #             id="subjects-input",
+                                        #             placeholder="Enter a value...",
+                                        #             type="number",
+                                        #             value=n_subjects,
+                                        #             # debounce=True,
+                                        #             min=1,
+                                        #             max=48,
+                                        #         ),
+                                        #     ]
+                                        # ),
                                         html.Label(
                                             [ html.Button(id='submit-button', n_clicks=0, children='Submit'),]
                                         ),
@@ -202,7 +202,7 @@ app.layout = html.Div(
                     ],
                 ),
 
-                html.H1(["Prediksi Saham Semen Indonesia dengan LSTM"]),
+                html.H1(["Prediksi bitcoin dengan LSTM"]),
                 html.Div(
                     className="row",
                     style={"margin-top": 30},
@@ -234,9 +234,9 @@ def sks(skenario,data_aw,data_sa):
         forecastData = data_sa[500:1000]
         f_data_sa = f_data_aw[:1000]
     elif (skenario == 3):
-        trainingData = data_sa[:-25]
-        forecastData = data_sa[25:50]
-        f_data_sa = f_data_aw[:50]
+        trainingData = data_sa[0:1000]
+        forecastData = data_sa[1000:1500]
+        f_data_sa = f_data_aw[:1500]
     return (trainingData, forecastData,f_data_sa)
 
 @app.callback(
@@ -284,39 +284,37 @@ def update_output1(n_clicks, input1, input2,  input3):
 
     return figure, MAPE, accuracy
 
-@app.callback(
-    [Output("data-table", "columns"), Output("data-table", "data")],
-    [Input("subjects-input", "value"), Input("times-input", "value")],
-    [State("data-table", "data")],
-)
+# @app.callback(
+#     [Output("data-table", "columns"), Output("data-table", "data")],
+#     [Input("times-input", "value")],
+#     [State("data-table", "data")],
+# )
 
-def update_data_table(subjects, rows, records):
+# def update_data_table( rows, records):
 
-    columns = [{"name": "Date (hr)", "id": "Date", "type": "datetime"}] + [
-        {
-            "name": "Close {}".format(subject + 1),
-            "id": str(subject),
-            "type": "numeric",
-        }
-        for subject in range(subjects)
-    ]
+#     columns = [{"name": "Date (hr)", "id": "Date", "type": "datetime"}] + [
+#         {
+#             "name": "Close {}".format(1),
+#             "type": "numeric",
+#         }
+#     ]
 
-    #   adjust number of rows
-    change = rows - len(records)
-    if change > 0:
-        for i in range(change):
-            records.append({c["id"]: "" for c in columns})
-    elif change < 0:
-        records = records[:rows]
+#     #   adjust number of rows
+#     change = rows - len(records)
+#     if change > 0:
+#         for i in range(change):
+#             records.append({c["id"]: "" for c in columns})
+#     elif change < 0:
+#         records = records[:rows]
 
-    #   delete column data if needed
-    valid_column_ids = ["Date"] + [str(x) for x in range(subjects)]
-    for record in records:
-        invalid_column_ids = set(record.keys()) - set(valid_column_ids)
-        for col_id in invalid_column_ids:
-            record.pop(col_id)
+#     #   delete column data if needed
+#     valid_column_ids = ["Date"]
+#     for record in records:
+#         invalid_column_ids = set(record.keys()) - set(valid_column_ids)
+#         for col_id in invalid_column_ids:
+#             record.pop(col_id)
 
-    return columns, records
+#     return columns, records
 
 
 @app.callback(

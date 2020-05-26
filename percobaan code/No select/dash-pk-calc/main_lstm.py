@@ -9,7 +9,7 @@ def maini(skenarioI, numEpochs, rate):
     sequenceLength = 5
     # numEpochs = int(input("masukkan banyak epoch : "))
 
-    DataSahamStr = 'data\SMGR.JKq.csv'
+    DataSahamStr = 'data\BTC-USD.csv'
     I_DataSaham = SKRIPSI_LSTM.readData(DataSahamStr)
     print ("Data yang dipakai adalah %s"%DataSahamStr)
     data = I_DataSaham

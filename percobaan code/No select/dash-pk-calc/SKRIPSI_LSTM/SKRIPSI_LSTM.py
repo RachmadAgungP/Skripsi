@@ -15,7 +15,7 @@ def optionBobot():
 class LSTMCell: 
     # numCells = ukuran penampungan I,o,z,dll
     # Size is the dimensionality of the input vector
-    def __init__(self, inputSize, numCells):
+    def __init__(self, inputSize, numCells,bobot):
         self.inputSize = inputSize
         self.numCells = numCells
 
@@ -23,10 +23,7 @@ class LSTMCell:
         # self.W = np.random.random((4 * numCells, inputSize + numCells)) * 2 \
         #                 - np.ones((4 * numCells, inputSize + numCells))
         
-        self.W = [[-0.245714286	,0.850360602	,0.029262045	,0.184398087]
-                ,[0.868020398	,0.860429754	,-0.379580925	,0.079506914]
-                ,[-0.206444161	,-0.24856166	,-0.085253247	,0.25112624	]
-                ,[0.842874383	,-0.324206065	,0.907722829	,-0.593738792]]
+        self.W = bobot
         
         W = pd.DataFrame(self.W)
         #bobot disimpan .csv
@@ -395,7 +392,7 @@ class LSTMNetwork:
 
 def sequenceProducer(trainingData, sequenceLength):
     indices = [i for i in range(0, trainingData.shape[0] - sequenceLength + 1, sequenceLength)] #inisial untuk training
-    random.shuffle(indices)
+    # random.shuffle(indices)
     for index in indices:
         yield trainingData[index:index + sequenceLength]
 

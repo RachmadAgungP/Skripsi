@@ -16,9 +16,10 @@ server = app.server
 
 PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
 
-Header_Data_Saham = dbc.CardHeader([
+Header_Data_Saham = dbc.CardHeader(className="bodyyy shadow rounded",children=[
                         html.Div(
                             style={"float": "left"},
+                            className="",
                             children=[
                             html.H5(["Data Saham Semen Indonesia"]),
                         ]), 
@@ -42,9 +43,10 @@ Header_Data_Saham = dbc.CardHeader([
                         ]),
                 ])
 
-Header_training = dbc.CardHeader([
+Header_training = dbc.CardHeader(className="bodyyy shadow rounded",children=[
                 html.Div(
                             style={"float": "left"},
+                            className="",
                             children=[
                             html.H5(["Training Data"]),
                         ]),
@@ -87,9 +89,10 @@ Header_training = dbc.CardHeader([
                         ]),
                 ])
 
-Header_testing = dbc.CardHeader([
+Header_testing = dbc.CardHeader(className="bodyyy shadow rounded",children=[
                         html.Div(
                             style={"float": "left"},
+                            className="",
                             children=[
                             html.H5(["Testing Data"]),
                         ]), 
@@ -100,9 +103,10 @@ Header_testing = dbc.CardHeader([
                         ]),
                 ])
 
-Header_prediksi = dbc.CardHeader([
+Header_prediksi = dbc.CardHeader(className="bodyyy shadow rounded",children=[
                         html.Div(
                             style={"float": "left"},
+                            className="",
                             children=[
                             html.H5(["Prediksi Data"]),
                         ]), 
@@ -129,7 +133,8 @@ Header_prediksi = dbc.CardHeader([
 app.layout = html.Div(
     children=[
         dbc.Navbar(
-            [    
+            className="content",
+            children=[    
                 # Use row and col to control vertical alignment of logo / brand
                 dbc.Row(
                     [
@@ -150,24 +155,26 @@ app.layout = html.Div(
                 children=[ 
                     dbc.Card(
                         
-                        className="shadow rounded text-white",
+                        className="shadow rounded ",
                         children=[
                             dbc.CardHeader(
-                            className="bodyy",
+                            className="content",
                             children=[
                             html.Img(src="https://www.bootstrapdash.com/demo/purple-admin-free/assets/images/dashboard/circle.svg", className="card-img-absolute", alt="circle-image"),
                             html.H2(["PREDIKSI HARGA SAHAM"]),
                             ]),
-                            dbc.CardBody(children=[
+                            dbc.CardBody(
+                            className="bodyy",
+                            children=[
                             # html.H5(["Metode LSTM (Long Short Term Memory)"]),
                             # Data Saham Semen Indonesia
                             dbc.Row(
-                                className="text-body",
+                                className="",
                                 children=[
                                     dbc.Col(className="col-sm-12",
                                     children=[
                                     dbc.Card(
-                                        className="bodyy shadow rounded",children=[
+                                        className="bodyyy shadow rounded",children=[
                                         Header_Data_Saham,
                                         html.Div(id="data")#Body_Data_Saham
                                         ]),
@@ -176,7 +183,7 @@ app.layout = html.Div(
                                     # Training
                                     dbc.Col(className="col-sm-12",
                                     children=[
-                                    dbc.Card(className="bodyy shadow rounded",children=[
+                                    dbc.Card(className="bodyyy shadow rounded",children=[
                                         Header_training,
                                         html.Div(id="data2")# Body_training
                                         ]),
@@ -185,7 +192,7 @@ app.layout = html.Div(
                                     # Testing 
                                     dbc.Col(className="col-sm-12",
                                     children=[
-                                    dbc.Card(className="bodyy shadow rounded",children=[
+                                    dbc.Card(className="bodyyy shadow rounded",children=[
                                         Header_testing,
                                         html.Div(id="data3")# Body_testing
                                         ]),
@@ -194,7 +201,7 @@ app.layout = html.Div(
                                     # Prediksi 
                                     dbc.Col(className="col-sm-12",
                                     children=[
-                                    dbc.Card(className="bodyy shadow rounded",children=[
+                                    dbc.Card(className="bodyyy shadow rounded",children=[
                                         Header_prediksi,
                                         html.Div(id="data4")# Body_prediksi
                                         ]),
@@ -259,7 +266,11 @@ print ("corpusData ",corpusData)
 max_ex = data[1]
 min_ex = data[2]
 corpusData = np.concatenate((np.ones((corpusData.shape[0], 1)), corpusData), axis=1)
-lstm = SKRIPSI_LSTM.LSTMCell(corpusData.shape[1], corpusData.shape[1]-2)
+W = [[-0.245714286	,0.850360602	,0.029262045	,0.184398087]
+                ,[0.868020398	,0.860429754	,-0.379580925	,0.079506914]
+                ,[-0.206444161	,-0.24856166	,-0.085253247	,0.25112624	]
+                ,[0.842874383	,-0.324206065	,0.907722829	,-0.593738792]]
+lstm = SKRIPSI_LSTM.LSTMCell(corpusData.shape[1], corpusData.shape[1]-2,W)
 
 @app.callback(Output("data", "children"),
               [Input('submit-button1', 'n_clicks')],
@@ -351,23 +362,22 @@ def data(n_clicks, input1):
     # data saham 
     data_ori = originalData_no_normalisasi.to_dict('rows')
     columns_ori =  [{"name": i, "id": i,} for i in (originalData_no_normalisasi.columns)]
-    tbl_ori = dt.DataTable(data=data_ori, columns=columns_ori,page_size=5,style_cell={'textAlign': 'center'},style_header={
-        'backgroundColor': 'rgb(230, 230, 230)',
-        'fontWeight': 'bold'
+    tbl_ori = dt.DataTable(data=data_ori, columns=columns_ori,page_size=5,style_cell={'textAlign': 'center',"color":"#09203f" },style_header={
+        "background-image": "linear-gradient(to top, #09203f 0%, #537895 100%)",
+        'fontWeight': 'bold',
+        "color":"white"
     })
     Body_Data_Saham = dbc.CardBody(
-                    className="text-body",
                     children=[
                         dbc.Row([
-                        dbc.Col(className="col-sm-4 text-body",
+                        dbc.Col(className="col-sm-4",
                             children=[
-                                dbc.Card(className="text-body",children=[html.H3("Data SAHAM"),html.Div([tbl_ori],style={"margin-right":"30px","margin-left":"30px"})]), 
+                                dbc.Card(className="footy text-dark shadow rounded",children=[dbc.CardHeader(className="footy text-dark rounded",children=[html.H6("Data SAHAM")]),html.Div(children=[tbl_ori],style={"margin-top":"15px","margin-right":"30px","margin-left":"30px"})]), 
                             ]),
                         dbc.Col(
                             className="col-sm-8",
                             children=[
-                                    
-                                    dcc.Graph(figure=figure_ori),   
+                                    dbc.Card(className="footy text-dark shadow rounded",children=[dcc.Graph(figure=figure_ori,style={"margin":"8px"})]),   
                                 ],          
                             ),
                         ]),
@@ -377,6 +387,12 @@ def data(n_clicks, input1):
 
 def train(n_clicks, input1, input2, value):
     print ("value t",value)
+    
+    W = [[-0.245714286	,0.850360602	,0.029262045	,0.184398087]
+                ,[0.868020398	,0.860429754	,-0.379580925	,0.079506914]
+                ,[-0.206444161	,-0.24856166	,-0.085253247	,0.25112624	]
+                ,[0.842874383	,-0.324206065	,0.907722829	,-0.593738792]]
+    lstm = SKRIPSI_LSTM.LSTMCell(corpusData.shape[1], corpusData.shape[1]-2,W)
     skenarioP = SKRIPSI_LSTM.sk(value,corpusData)
     trainingData = skenarioP[0]
     train_error = lstm.train(trainingData, input1, input2, sequenceLength,max_ex,min_ex)
@@ -393,29 +409,30 @@ def train(n_clicks, input1, input2, value):
     # data training
     data = df.to_dict('rows')
     columns =  [{"name": i, "id": i,} for i in (df.columns)]
-    tra = dt.DataTable(data=data, columns=columns,page_size=5,style_cell={'textAlign': 'center'},style_header={
-        'backgroundColor': 'rgb(230, 230, 230)',
-        'fontWeight': 'bold'
+    tra = dt.DataTable(data=data, columns=columns,page_size=5,style_cell={'textAlign': 'center',"color":"#09203f"},style_header={
+        "background-image": "linear-gradient(to top, #09203f 0%, #537895 100%)",
+        'fontWeight': 'bold',
+        "color":"white"
     })
 
     fig_data_training = []
     fig_data_training.append(go.Scatter(x= df["date"].tolist(), y= df["x(close)"].tolist(), mode='lines', name='Train'))
     figure_training = figur(fig_data_training)
     Body_training = dbc.CardBody(
-                    className="text-body",
+                    className="",
                     children=[
                         dbc.Row([
-                        dbc.Col(className="col-sm-4 text-body",
+                        dbc.Col(className="col-sm-4 ",
                             children=[
-                                dbc.Card(className="text-body",children=[html.H3("Data Trainig"),html.Div([tra],style={"margin-right":"30px","margin-left":"30px"})]), 
+                                dbc.Card(className="footy text-dark shadow rounded",children=[dbc.CardHeader(className="footy text-dark rounded",children=[html.H6("Data Training")]),html.Div([tra],style={"margin-top":"15px","margin-right":"30px","margin-left":"30px"})]), 
                                     ]),
-                                dbc.Col(className="col-sm-8 text-body",
+                                dbc.Col(className="col-sm-8 ",
                                     children=[
-                                        dbc.Card(className="text-body",children=[dcc.Graph(figure=figure_training,style={"margin":"8px"})]), 
+                                        dbc.Card(className="footy text-dark shadow rounded",children=[dcc.Graph(figure=figure_training,style={"margin":"8px"})]), 
                                     ]),
-                                dbc.Col(className="col-sm-12 text-body",
+                                dbc.Col(className="col-sm-12 ",
                                     children=[
-                                        dbc.Card(className="text-body",children=[dcc.Graph(figure=figure_error,style={"margin":"8px"})]), 
+                                        dbc.Card(className="footy text-dark shadow rounded",children=[dcc.Graph(figure=figure_error,style={"margin":"8px"})]), 
                                     ],style={"margin-top":"15px"}),
                         ])
                     
@@ -452,9 +469,10 @@ def test(n_clicks,value):
 
     data1 = df1.to_dict('rows')
     columns1 =  [{"name": i, "id": i,} for i in (df1.columns)]
-    fore = dt.DataTable(data=data1, columns=columns1,page_size=5,style_cell={'textAlign': 'center'},style_header={
-        'backgroundColor': 'rgb(230, 230, 230)',
-        'fontWeight': 'bold'
+    fore = dt.DataTable(data=data1, columns=columns1,page_size=5,style_cell={'textAlign': 'center',"color":"#09203f"},style_header={
+        "background-image": "linear-gradient(to top, #09203f 0%, #537895 100%)",
+        'fontWeight': 'bold',
+        "color":"white"
     })
 
     # tabel hasil prediksi 
@@ -465,49 +483,50 @@ def test(n_clicks,value):
 
     data2 = tbl_lstm.to_dict('rows')
     columns2 =  [{"name": i, "id": i,} for i in (tbl_lstm.columns)]
-    tbl_hasil = dt.DataTable(data=data2, columns=columns2,page_size=5,style_cell={'textAlign': 'center'},style_header={
-        'backgroundColor': 'rgb(230, 230, 230)',
-        'fontWeight': 'bold'
+    tbl_hasil = dt.DataTable(data=data2, columns=columns2,page_size=5,style_cell={'textAlign': 'center',"color":"#09203f"},style_header={
+        "background-image": "linear-gradient(to top, #09203f 0%, #537895 100%)",
+        'fontWeight': 'bold',
+        "color":"white"
     })
 
     Body_testing = dbc.CardBody(
-                    className="text-body",
+                    className="",
                     children=[
                         dbc.Row([
-                            dbc.Col(className="col-sm-4 text-body",
+                            dbc.Col(className="col-sm-4 ",
                                     children=[
-                                    dbc.Card(className="text-body",
-                                        children=[html.H3("Data Testing"),html.Div([fore],style={"margin-right":"30px","margin-left":"30px"})]), 
+                                    dbc.Card(className="footy text-dark shadow rounded",
+                                        children=[dbc.CardHeader(className="footy text-dark rounded",children=[html.H6("Data Testing")]),html.Div([fore],style={"margin-top":"15px","margin-right":"30px","margin-left":"30px"})]), 
                                         ]),
-                                    dbc.Col(className="col-sm-8 text-body",
+                                    dbc.Col(className="col-sm-8 ",
                                         children=[
-                                            dbc.Card(className="text-body",children=[dcc.Graph(figure=figure_data_testing,style={"margin":"8px"})]), 
+                                            dbc.Card(className="footy text-dark shadow rounded",children=[dcc.Graph(figure=figure_data_testing,style={"margin":"8px"})]), 
                                         ]),
                                     dbc.Col(
-                                        style={"margin-top":"20px"},
+                                        style={"margin-top":"15px"},
                                         className="col-sm-12",
                                         children=[
-                                            dbc.Card([
+                                            dbc.Card(className="footy text-dark shadow rounded",children=[
                                                 dcc.Graph(figure=figure_hasil),
                                             dbc.Row([
-                                                dbc.Col([html.Div(children=["MAPE"]),dbc.Card([html.Div([MAPE])]),
+                                                dbc.Col([dbc.Card(className="content shadow rounded",style={"margin":"15px"},children=[html.Div(children=["MAPE %"]),html.Div([MAPE])]),
                                                 ]),
-                                                dbc.Col([html.Div(children=["Akurasi"]),dbc.Card([html.Div([accuracy])]),
+                                                dbc.Col([dbc.Card(className="content shadow rounded",style={"margin":"15px"},children=[html.Div(children=["Akurasi %"]),html.Div([accuracy])]),
                                                 ]),
-                                                dbc.Col([html.Div(children=["MSE"]),dbc.Card([MSE]), 
+                                                dbc.Col([dbc.Card(className="content shadow rounded",style={"margin":"15px"},children=[html.Div(children=["MSE"]),html.Div([MSE])]), 
                                                 ])
                                                 ])
                                             ],       
                                         ),
+                                    ]),
                                     dbc.Col(
                                         className="col-sm-12",
                                         children=[
-                                        dbc.Card([
-                                            dbc.CardHeader([html.H5("Hasil Prediksi")]),
-                                            dbc.CardBody([html.Div([tbl_hasil],style={"margin": "20px"})])
+                                        dbc.Card(className="footy text-dark shadow rounded",children=[
+                                            dbc.CardHeader(className="footy text-dark shadow rounded",children=[html.H5("Hasil Prediksi")]),
+                                            dbc.CardBody([html.Div(children=[tbl_hasil],style={"margin-top":"15px","margin-right":"50px","margin-left":"50px"})])
                                         ]) 
                                         ],style={"margin-top":"15px"}),
-                        ])
                     ])
                 ])
     return Body_testing
@@ -525,23 +544,24 @@ def prediksi(n_clicks,input4,value):
 
     data3 = hasil_Mypredict.to_dict('rows')
     columns3 = [{"name":i,"id":i,} for i in (hasil_Mypredict.columns)]
-    tbl_hasil = dt.DataTable(data=data3, columns=columns3,page_size=5,style_cell={'textAlign': 'center'},style_header={
-        'backgroundColor': 'rgb(230, 230, 230)',
-        'fontWeight': 'bold'
+    tbl_hasil = dt.DataTable(data=data3, columns=columns3,page_size=5,style_cell={'textAlign': 'center',"color":"#09203f"},style_header={
+        "background-image": "linear-gradient(to top, #09203f 0%, #537895 100%)",
+        'fontWeight': 'bold',
+        "color":"white"
     })
 
     Body_prediksi = dbc.CardBody(
-                    className="text-body",
+                    className="",
                     children=[
                         dbc.Row([
-                            dbc.Col(className="col-sm-4 text-body",
+                            dbc.Col(className="col-sm-4 ",
                                     children=[
-                                    dbc.Card(className="text-body",
-                                        children=[html.H3("Data Prediksi"),html.Div([tbl_hasil],style={"margin-right":"30px","margin-left":"30px"})]), 
+                                    dbc.Card(className="footy text-dark shadow rounded",
+                                        children=[dbc.CardHeader(className="footy text-dark rounded",children=[html.H6("Data Prediksi")]),html.Div([tbl_hasil],style={"margin-top":"15px","margin-right":"30px","margin-left":"30px"})]), 
                                         ]),
-                                    dbc.Col(className="col-sm-8 text-body",
+                                    dbc.Col(className="col-sm-8 ",
                                         children=[
-                                            dbc.Card(className="text-body",children=[dcc.Graph(figure=figure_hasil,style={"margin":"8px"})]), 
+                                            dbc.Card(className="footy text-dark shadow rounded",children=[dcc.Graph(figure=figure_hasil,style={"margin":"8px"})]), 
                                         ]),
                     ])
                 ])

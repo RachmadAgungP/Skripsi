@@ -392,25 +392,24 @@ def forecastSequenceProducer(trainingData, sequenceLength):
         yield trainingData[i:i + sequenceLength]
     
 def sk(skenario,data_sa):
+    trainingData = data_sa[:-1000]
+    forecastData = data_sa[500:-500]
+    
+    
     if (skenario == 1):
         trainingData = data_sa[:-250]
         forecastData = data_sa[250:500]
+       
     elif (skenario == 2):
         trainingData = data_sa[:-500]
         forecastData = data_sa[500:1000]
+       
     elif (skenario == 3):
-        trainingData = data_sa[:-25]
-        forecastData = data_sa[25:50]
-    elif (skenario == 4):
-        trainingData = data_sa[:-10]
-        forecastData = data_sa[10:20]
-    elif (skenario == 5):
-        trainingData = data_sa[:-3]
-        forecastData = data_sa[5:10]
-    else :
-        trainingData = data_sa[:-1000]
-        forecastData = data_sa[500:-500]
+        trainingData = data_sa[0:1000]
+        forecastData = data_sa[1000:1500]
+        
     return (trainingData, forecastData)
+
 
 def denormal (sequenceLength,sequence,max_ex,min_ex):
     sequenceN = []
