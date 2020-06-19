@@ -395,14 +395,17 @@ class LSTMCell:
         return (f_h[-1],f_l,f_z,f_c,f_o,f_f,f_i,f_c_bar,f_h,f_W)
 
     def forecastKSteps(self, forecastingData, timeData, k):
-        self.forwardPass(forecastingData)
+        forward = self.forwardPass(forecastingData,"prediksi")
+        f_h = np.transpose(np.transpose(forward[7]))
+        for i in range(k-1):
+            lastForecast = f_h[-1]
+            hh = f_h[-1].tolist()
+            nextInput = np.hstack(([1], timeData[i], hh[0]))
+            self.forwardStep(nextInput,"prediksi")
+        
+        # return np.transpose(np.transpose(self.h[-k:]))
+        return (f_h[:])
 
-        for i in range(k - 1):
-            lastForecast = self.h[-1]
-            nextInput = np.concatenate(([1], timeData[i], self.h[-1]), axis=1)
-            self.forwardStep(nextInput)
-
-        return np.transpose(np.transpose(self.h[-k:]))
 
     # needs fixing
     def test(self, testingData, sequenceLength):
