@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.metrics import precision_recall_fscore_support as score
 from tampil_hasil import tampilkan as menampilkan
 import datetime
-
+import time
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
@@ -105,8 +105,13 @@ class LSTMCell:
         self.o.append(np.zeros(numCells)) 
         self.I.append(np.zeros(numCells)) 
         self.z.append(np.zeros(numCells)) 
-
-        O_h = [self.forwardStep(x_t,jenis)[0] for x_t in x]
+        O_h = []
+        O_c = []
+        for x_t in x:
+            fors = self.forwardStep(x_t,jenis)
+            O_h.append(fors[0])
+            O_c.append(fors[1])
+        print (O_c,"ini adalah c")
         
         return (O_h)
 
@@ -167,6 +172,7 @@ class LSTMCell:
 
     def train(self, trainingData, numEpochs, learningRate, sequenceLength,max_ex,min_ex):
         
+        start_time = time.time()
         adaptiveLearningRate = learningRate
         error_t=[]
 
@@ -208,6 +214,7 @@ class LSTMCell:
         model.to_csv("model.csv",index=False)
         print ("tbl_error ",tbl_error)
         #  -----------------------------------------
+        print("--- %s seconds ---" % (time.time() - start_time))
         return (tbl_error)
 
     def forecast(self, forecastingData):

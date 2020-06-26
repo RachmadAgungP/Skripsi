@@ -1,4 +1,4 @@
-import SKRIPSI_LSTM
+import SKRIPSI_LSTM_
 import numpy as np
 import pandas as pd
 from data.preprosesing_data import readData
@@ -26,11 +26,11 @@ def maini(skenarioI, numEpochs, rate,sequenceLength_prediksi):
     corpusData = np.concatenate((np.ones((corpusData.shape[0], 1)), corpusData), axis=1)
     # skenarioI = int(input("masukkan skenario pilihan : "))
 
-    skenarioP = SKRIPSI_LSTM.sk(skenarioI,corpusData)
+    skenarioP = SKRIPSI_LSTM_.sk(skenarioI,corpusData)
     # rate = float(input("masukkan learning rate : "))
 
     print("--------------------------------------------------")
-    lstm = SKRIPSI_LSTM.LSTMCell(corpusData.shape[1], corpusData.shape[1]-2,W)
+    lstm = SKRIPSI_LSTM_.LSTMCell(corpusData.shape[1], corpusData.shape[1]-2,W)
     
     # lstm = SKRIPSI_LSTM.LSTMCell(corpusData.shape[1], corpusData.shape[1]-2,W)
     
@@ -49,7 +49,7 @@ def maini(skenarioI, numEpochs, rate,sequenceLength_prediksi):
     print("min",data[2])
     print ("max",data[1])
     originalData = data[3]
-    data_no_normalisasi = SKRIPSI_LSTM.sk(skenarioI,originalData)
+    data_no_normalisasi = SKRIPSI_LSTM_.sk(skenarioI,originalData)
     # data saham semuanya 
     originalData_no_normalisasi = pd.DataFrame(data=originalData,columns=["date","x(close)"])
     # data saham treining
@@ -59,13 +59,13 @@ def maini(skenarioI, numEpochs, rate,sequenceLength_prediksi):
 
     forecastData = skenarioP[1]
     
-    forecastSequences = SKRIPSI_LSTM.forecastSequenceProducer(forecastData, sequenceLength)
+    forecastSequences = SKRIPSI_LSTM_.forecastSequenceProducer(forecastData, sequenceLength)
 
     # print ("ini",hasil_Mypredict)
 
-    forecast_ori_Sequences = SKRIPSI_LSTM.forecastSequenceProducer(data_no_normalisasi[1], sequenceLength)
+    forecast_ori_Sequences = SKRIPSI_LSTM_.forecastSequenceProducer(data_no_normalisasi[1], sequenceLength)
     # pred
-    hasil_predict = SKRIPSI_LSTM.prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenceLength)
+    hasil_predict = SKRIPSI_LSTM_.prediksi(forecast_ori_Sequences,forecastSequences,lstm,max_ex,min_ex,sequenceLength)
     waktu = hasil_predict[0]
     real = hasil_predict[1]
     prediksi = hasil_predict[2]
@@ -77,13 +77,13 @@ def maini(skenarioI, numEpochs, rate,sequenceLength_prediksi):
     MSE = hasil_predict[5]
     tbl_hasil = hasil_predict[6]
     # x,y=SKRIPSI_LSTM.intersection(waktu,real,waktu,prediksi)
-    SKRIPSI_LSTM.pl.grid()
+    SKRIPSI_LSTM_.pl.grid()
     print(tbl_hasil)
     # de = SKRIPSI_LSTM.denormalisasi(forecastSequences,max_ex,min_ex)
     # print (de)
-    forecastSequences1 = SKRIPSI_LSTM.forecastSequenceProducer(forecastData, sequenceLength)
+    forecastSequences1 = SKRIPSI_LSTM_.forecastSequenceProducer(forecastData, sequenceLength)
     print (type(forecastSequences1))
-    hasil_Mypredict = SKRIPSI_LSTM.myprediksi(forecastSequences1,lstm,max_ex,min_ex,sequenceLength_prediksi)
+    hasil_Mypredict = SKRIPSI_LSTM_.myprediksi(forecastSequences1,lstm,max_ex,min_ex,sequenceLength_prediksi)
     # r = prediksi
     # SKRIPSI_LSTM.pl.plot(waktu, prediksi, 'r')
     # SKRIPSI_LSTM.pl.plot(waktu, real, 'b')
